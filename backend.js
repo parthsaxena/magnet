@@ -68,6 +68,19 @@ if (!fs.existsSync(getAppDataPath())) {
             });
     }
 }
+if (fs.existsSync("/tmp/torrent-stream")) {    
+    fs.rmdir("/tmp/torrent-stream", { 
+      recursive: true, 
+        }, (error) => { 
+          if (error) { 
+            console.log(error); 
+          } else { 
+            console.log("Wiped tmp"); 
+          }
+        }); 
+} else {
+    console.log("No tmp folder found");
+}
 
 var recsNeedUpdate = true;
 
