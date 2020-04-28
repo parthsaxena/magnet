@@ -7,9 +7,7 @@
       <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-      
         <script src="https://kit.fontawesome.com/71f8337c07.js" crossorigin="anonymous"></script>
-
       <script src="js/general.js"></script>   
         <link rel="stylesheet" href="https://cdn.plyr.io/3.5.10/plyr.css" />         
         <header>
@@ -29,7 +27,7 @@
                   <!-- Links -->
                   <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                      <a class="nav-link" href="trending"><strong>Trending</strong></a>
+                      <a class="nav-link" href="trending">Trending</a>
                   </li>
                       <li class="nav-item">
                           <a class="nav-link" href="movies">For You
@@ -60,6 +58,7 @@
                   </ul>
                   <!-- Links -->
 
+                  <a id="vpn_warning" style="display: inline; border: 1px solid #cebc8b; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: #cebc8b;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: #cebc8b;"></i> <span style="color:#cebc8bl"> VPN</span></a>  
                   <form class="form-inline" action="search" method="GET">
                       <div class="md-form my-0" style=" position: relative; top: 5px;">
                           <i class="fa fa-search" style="position: relative; left: 28px; color: #cebc8b;"></i>
@@ -72,7 +71,7 @@
           </nav>
           <!--/.Navbar-->
         </header>        
-        <style>                        
+        <style>                
             #recs {
                 display: none;
             }
@@ -270,6 +269,16 @@
     </head>
     <body id="background" class="movie_details_background" style="overflow-y: hidden;">
         <script src="js/plyr.js"></script>
+        
+        <div class="modal_funny" id="modal_funny">
+          <div class="modal_funny-content">
+            <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
+            <h3>VPN Advisory</h3>
+            <div class="modal_funny-area">
+                <p><span style="font-weight: 700;">We encourage the use of a VPN to prevent ISP snooping.</span><br>Get <a href="https://www.betternet.co/" target="_blank" style="color: #cebc8b"><span style="font-weight: 700;">Betternet VPN</span></a> for free to safely stream movies fast!</p>
+            </div>
+          </div>
+        </div>
         
         <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;" onclick="exitPlayer();"><</div></button>
         

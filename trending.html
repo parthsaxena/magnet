@@ -6,10 +6,10 @@
       <link rel="stylesheet" href="css/style.css">
       <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>      
       <script src="js/general.js"></script>  
-        <script>function link_movieDetails(movie_id){ location.href = 'movie?q='+movie_id;}function findGetParameter(parameterName) { var result = null, tmp = []; location.search .substr(1) .split("&") .forEach(function (item) { tmp = item.split("="); if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]); }); return result;}function signInUser(){ var email = document.getElementById("login_email").value; var password = document.getElementById("login_password").value; firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) { var errorCode = error.code; var errorMessage = error.message; document.getElementById("login_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage) });}function createUser_RDB(user_id, email){ firebase.database().ref("users/"+user_id).set({ user_id: user_id, email: email, });}function signUpUser(){ var email = document.getElementById("signup_email").value; var password = document.getElementById("signup_password").value; firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){ firebase.auth().signInWithEmailAndPassword(email, password).then(function(error){ console.log("Error code: "+ error.code); console.log("Error message: "+error.message); }); firebase.auth().onAuthStateChanged(function(user) { if (user) { createUser_RDB(user.uid, user.email); console.log("User created in realtime db."); } else { console.log("User is not signed in."); } }); }).catch(function(error){ var errorCode = error.code; var errorMessage = error.message; document.getElementById("signup_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage); });}</script>
+        <script src="https://kit.fontawesome.com/71f8337c07.js" crossorigin="anonymous"></script>
+        <script>function link_movieDetails(movie_id){ location.href = 'movie?q='+movie_id;}function findGetParameter(parameterName) { var result = null, tmp = []; location.search .substr(1) .split("&") .forEach(function (item) { tmp = item.split("="); if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]); }); return result;}function signInUser(){ var email = document.getElementById("login_email").value; var password = document.getElementById("login_password").value; firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) { var errorCode = error.code; var errorMessage = error.message; document.getElementById("login_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage) });}function createUser_RDB(user_id, email){ firebase.database().ref("users/"+user_id).set({ user_id: user_id, email: email, });}function signUpUser(){ var email = document.getElementById("signup_email").value; var password = document.getElementById("signup_password").value; firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){ firebase.auth().signInWithEmailAndPassword(email, password).then(function(error){ console.log("Error code: "+ error.code); console.log("Error message: "+error.message); }); firebase.auth().onAuthStateChanged(function(user) { if (user) { createUser_RDB(user.uid, user.email); console.log("User created in realtime db."); } else { console.log("User is not signed in."); } }); }).catch(function(error){ var errorCode = error.code; var errorMessage = error.message; document.getElementById("signup_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage); });}</script>               
         <header id="header">
           <nav class="navbar navbar-expand-lg navbar-dark" style="background: black;">
               <!-- Navbar brand -->
@@ -27,7 +27,7 @@
                   <!-- Links -->
                   <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                      <a class="nav-link active" href="trending"><strong>Trending</strong></a>
+                      <a class="nav-link active" href="trending">Trending</a>
                   </li>
                       <li class="nav-item">
                           <a class="nav-link" href="movies">For You
@@ -57,9 +57,10 @@
                       </li>
                   </ul>
                   <!-- Links -->
+                  <a id="vpn_warning" style="display: inline; border: 1px solid #cebc8b; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: #cebc8b;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: #cebc8b;"></i> <span style="color:#cebc8bl"> VPN</span></a>  
 
-                  <form class="form-inline" action="search" method="GET">
-                      <div class="md-form my-0" style=" position: relative; top: 5px;">
+                  <form class="form-inline" action="search" method="GET">                        
+                      <div class="md-form my-0" style=" position: relative; top: 5px;">                                                                                            
                           <i class="fa fa-search" style="position: relative; left: 28px; color: #cebc8b;"></i>
                           <input name="q" id="searchbar" class="form-control searchbar" type="text" placeholder="Search..." aria-label="Search" style="width: 300px; padding-left: 30px; border-bottom: 1px solid #cebc8b;">
                       </div>
@@ -72,9 +73,32 @@
         </header>
     </head>
     <body class="background">
+        
+        <div class="modal_funny" id="modal_funny">
+          <div class="modal_funny-content">
+            <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
+            <h3>VPN Advisory</h3>
+            <div class="modal_funny-area">
+                <p><span style="font-weight: 700;">We encourage the use of a VPN to prevent ISP snooping.</span><br>Get <a href="https://www.betternet.co/" target="_blank" style="color: #cebc8b"><span style="font-weight: 700;">Betternet VPN</span></a> for free to safely stream movies fast!</p>
+            </div>
+          </div>
+        </div>
+
+        
         <div class="container-fluid" id="movies" style="max-width: 99.3%;">
           <!--<h4 style="position: relative; top: 10px; color: white;">Comedy</h4><br>-->
             <script>
+                function openVPNAdvisory(){                    
+                    $(function() {
+                          $("#notify").fadeIn();
+                    });
+                }  
+                function closeVPNAdvisory(){
+                    $(function() {
+                          $("#notify").fadeOut();
+                    });
+                }
+                
                 function truncate(str, no_words) {
                     return str.split(" ").splice(0,no_words).join(" ");
                 }
