@@ -70,7 +70,8 @@ a.dropdown-item:hover {
 }
 
 .card {
-  background:none;
+  background: #0f0f0f;
+  border: none;
   cursor: pointer;
 }
 
@@ -279,3 +280,4 @@ input:active {
 .modal_funny-area {
   padding:20px;
 }
+

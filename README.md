@@ -20,13 +20,13 @@
 </div>
 <div id="features">
   <h2>Features</h2>
-  <p align="center">For You - Get personalized movie recommendations based on your watching history 
+  <p align="center"><strong>For You</strong> - Get personalized movie recommendations based on your watching history 
   <img src="http://magnet.socifyinc.com/img/ForYou.png" width="97%" alt="Magnet" />
   </p>
-  <p align="center">Full-featured Player - Beautiful player with subtitle & casting support
+  <p align="center"><strong>Full-Featured Player</strong> - Beautiful player with subtitle & casting support
   <img src="http://magnet.socifyinc.com/img/Player.png" width="97%" alt="Magnet" />
   </p>
-  <p align="center">Extensive Database - Search from a database of over 15,000+ movies
+  <p align="center"><strong>Extensive Database</strong> - Search from a database of over 15,000+ movies
   <img src="http://magnet.socifyinc.com/img/MovieDetails.png" width="97%" alt="Magnet" />
   </p>
 </div>
