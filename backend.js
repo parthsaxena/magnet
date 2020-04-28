@@ -68,19 +68,6 @@ if (!fs.existsSync(getAppDataPath())) {
             });
     }
 }
-if (fs.existsSync("/tmp/torrent-stream")) {    
-    fs.rmdir("/tmp/torrent-stream", { 
-      recursive: true, 
-        }, (error) => { 
-          if (error) { 
-            console.log(error); 
-          } else { 
-            console.log("Wiped tmp"); 
-          }
-        }); 
-} else {
-    console.log("No tmp folder found");
-}
 
 var recsNeedUpdate = true;
 
@@ -89,6 +76,7 @@ var mylist_db;
 var history_db;
 var history_ids;
 var isRetrieving = false;
+electron.app.disableHardwareAcceleration()
 electron.app.on("ready", function() {
     request('http://magnet.socifyinc.com/stable/version.json', function(error, response, body) {
         if (error) { console.log("error retrieving version.json"); start(); } else {
@@ -136,7 +124,7 @@ electron.app.on("ready", function() {
     });
 });
 
-function start() {
+function start() {    
     request('http://magnet.socifyinc.com/stable/db_version.json', function (error, response, body) {      
       var version_json = JSON.parse(body);
       var version_string = version_json["version"];
@@ -497,10 +485,7 @@ app.get('/movie', cors(), function(request, response) {
     var json = db[imdb_id];
     response.set('Content-Type', 'text/html');
     console.log("[MovieDetails] ID: " + imdb_id);
-    
-    //get_subtitles(imdb_id);
-    serve_movie(imdb_id);
-    
+   
     if (Object.keys(mylist_db).includes(imdb_id)) {
       json["on_list"] = "true";
     } else {
@@ -834,6 +819,7 @@ var streamingEndpoint = "";
 global.streaming = false;
 global.magengine;
 global.serve_movie = function(id) {
+    console.log("SERVE MOVIE REQUESTED");
     destroy_engine();    
     streamingEndpoint = '/stream_' + id
     app.get('/stream_' + id, function(request, response) {
@@ -882,10 +868,13 @@ global.serve_movie = function(id) {
 
 function destroy_engine() {
     if (streaming) {
-        magengine.destroy(function() {
-            console.log("[Engine] Destroyed Engine");
-            streaming = false;
-        });
+        magengine.remove(function() {
+            console.log("[Engine] Removed Files");
+            magengine.destroy(function() {
+                console.log("[Engine] Destroyed Engine");
+                streaming = false;
+            }); 
+        });        
     }
 }
 
@@ -1044,10 +1033,10 @@ function dotProduct(userVector, movieObject, featureList){
 
 const streamTorrent = function(torrent) {
     return new Promise(function (resolve, reject) {
-        console.log("[Magengine] Opening Stream ...");
-        streaming = true;
-        magengine = torrentStream(torrent, {path: path.join(getAppDataPath(), "streams")});
+        console.log("[Magengine] Opening Stream ...");        
+        magengine = torrentStream(torrent, {tmp: getAppDataPath(), path: path.join(getAppDataPath(), "streams")});
         magengine.on('ready', function() {
+            streaming = true;
             console.log("[Magengine] Ready ...");
             magengine.files.forEach(function (file, idx) {
                 console.log('[Magengine] Filename:', file.name);

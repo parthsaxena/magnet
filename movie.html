@@ -311,25 +311,7 @@
                         $(".plyr").hide();                        
                     });                   
                     var bg_image = "";
-                    var isInPlayer = false;
-                    function watch() {     
-                        isInPlayer = true;             
-                        var jumbotron = document.getElementsByClassName("jumbotron")[0];
-                        var overlay = document.getElementsByClassName("overlay_dewey")[0]; 
-                        bg_image = document.getElementById("background").style.backgroundImage;
-                       $("#header").fadeOut(1000);
-                       $("#bg_layer").fadeTo(1000, 0);         
-                        setTimeout(function() { 
-                             $(".plyr").fadeIn(1000);
-                            player.play();
-                            $("#player_exit").fadeIn(1000);
-                            document.getElementById("big_player").style.display = "block"
-                            document.querySelector("video").style.display = "block"
-                            //exitPlayer();
-                        }, 1000);                          
-                                                                    
-                        return false;
-                    }
+                    var isInPlayer = false;                    
                                         
                     function exitPlayer() {
                         isInPlayer = false;             
@@ -359,6 +341,39 @@
                     //remote.getGlobal("serve_movie")(IMDB_ID);
                     var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");         
             
+                    const PROVIDED_TIMESTAMP = {{timestamp}};
+                    const DURATION = {{duration}};
+                    function watch() {                          
+                        var f = PROVIDED_TIMESTAMP + 10;
+                        var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
+                        var B_URL = "http://localhost:3000/stream_" + IMDB_ID;    
+                        //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
+                        //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";               
+                        if (PROVIDED_TIMESTAMP != 0) {
+                            document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';   
+                        } else {
+                            document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';   
+                        } 
+                        console.log("TAPPED");
+                        remote.getGlobal("serve_movie")(IMDB_ID);
+                        isInPlayer = true;             
+                        var jumbotron = document.getElementsByClassName("jumbotron")[0];
+                        var overlay = document.getElementsByClassName("overlay_dewey")[0]; 
+                        bg_image = document.getElementById("background").style.backgroundImage;
+                       $("#header").fadeOut(1000);
+                       $("#bg_layer").fadeTo(1000, 0);         
+                        setTimeout(function() { 
+                             $(".plyr").fadeIn(1000);
+                            player.play();
+                            $("#player_exit").fadeIn(1000);
+                            document.getElementById("big_player").style.display = "block"
+                            document.querySelector("video").style.display = "block"
+                            //exitPlayer();
+                        }, 1000);                          
+                                                                    
+                        return false;
+                    }
+                    
                     remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
                       .then(res => {
                         for (sub of res) {
@@ -383,20 +398,7 @@
                             }
                         }                        
                       })
-                      .catch(error => {});
-                                        
-                    const PROVIDED_TIMESTAMP = {{timestamp}};
-                    const DURATION = {{duration}};
-                    var f = PROVIDED_TIMESTAMP + 10;
-                    var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
-                    var B_URL = "http://localhost:3000/stream_" + IMDB_ID;    
-                    //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
-                    //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";               
-                    if (PROVIDED_TIMESTAMP != 0) {
-                        document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';   
-                    } else {
-                        document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';   
-                    }           
+                      .catch(error => {});                                                                      
                 </script>                                                    
                 </video>
                 </div>
