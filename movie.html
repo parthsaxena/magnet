@@ -7,7 +7,9 @@
       <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      
+        <script src="https://kit.fontawesome.com/71f8337c07.js" crossorigin="anonymous"></script>
+
       <script src="js/general.js"></script>   
         <link rel="stylesheet" href="https://cdn.plyr.io/3.5.10/plyr.css" />         
         <header>
@@ -300,8 +302,9 @@
                         $(".plyr").hide();                        
                     });                   
                     var bg_image = "";
-                    
-                    function watch() {       
+                    var isInPlayer = false;
+                    function watch() {     
+                        isInPlayer = true;             
                         var jumbotron = document.getElementsByClassName("jumbotron")[0];
                         var overlay = document.getElementsByClassName("overlay_dewey")[0]; 
                         bg_image = document.getElementById("background").style.backgroundImage;
@@ -318,9 +321,9 @@
                                                                     
                         return false;
                     }
-                    
+                                        
                     function exitPlayer() {
-                                                
+                        isInPlayer = false;             
                         player.pause();
                         if (isLoadingOpen) {
                             close_loading_modal();
@@ -423,6 +426,7 @@
                   <div id="rating" style="display: inline;"><i class="fa fa-star" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
                   &nbsp;<div id="year" style="display: inline;"><i class="fa fa-calendar" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
                   &nbsp;<div id="runtime" style="display: inline;"><i class="fa fa-clock-o" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
+                  &nbsp;<div id="seeds" style="display: inline;"><i class="fas fa-users" style="color: #32a852; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
                   </div>
                   <p id="movie_summary" style="max-width: 500px; position: relative; top: 10px; max-height: 95px; overflow-y: scroll; padding-right: 5px;"></p><br>
                   <div style="position: relative; bottom: 10px;">
@@ -469,13 +473,15 @@
             });
             
             player.on('controlsshown', event => {
-                //$("#player_exit").fadeIn(1000);
+                $("#player_exit").fadeIn(1000);
             });
             
             player.on('controlshidden', event => {
-                /*setTimeout(function() {
+                if (hasPlayed) {
+                    setTimeout(function() {
                   $("#player_exit").fadeOut(1000);  
-                }, 1000);*/                
+                }, 1000);     
+                }                           
             });
             
             player.on('ended', event => {
@@ -494,6 +500,7 @@
 
             var isFirstTime = true;
             player.on('waiting', event => {
+                $("#player_exit").fadeIn(700);
                 if (isFirstTime) {
                     open_notice_modal();                          
                 }
@@ -502,7 +509,8 @@
             });
             
             var hasPlayed = false;            
-            player.on('playing', event => {      
+            player.on('playing', event => {   
+                $("#player_exit").fadeOut(700);
                 if (!hasPlayed) { 
                     hasPlayed = true;                                        
                     update_interval = setInterval(function() {
@@ -518,6 +526,9 @@
                 }
             });
             player.on('pause', event => {
+                if (isInPlayer) {
+                    $("#player_exit").fadeIn(700);
+                }
                 console.log("We're playing");
                 close_loading_modal();
             });
@@ -624,6 +635,21 @@
             //document.getElementById("watch_button").href = "stream_id?q={{watch_id}}";
             //document.getElementById("mylist_button").href = "add_to_list?q={{add_id}}";
             
+            var currentHighSeeds = 0;
+            var currentHighIndex = 0;
+            for (var i = 0; i < movie["torrents"].length; i++) {                
+                if (movie["torrents"][i]["seeds"] > currentHighSeeds && movie["torrents"][i]["quality"]) {
+                    currentHighSeeds = movie["torrents"][i]["seeds"];
+                    currentHighIndex = i;
+                }
+            }
+            if (currentHighSeeds > 200) {
+                document.getElementById("seeds").innerHTML = '<i class="fas fa-users" style="color: #32a852; font-size: 1.2rem;"></i>&nbsp;&nbsp;<span style="color:#32a852">' + currentHighSeeds + "</span>";   
+            } else if (currentHighSeeds > 100) {
+                document.getElementById("seeds").innerHTML = '<i class="fas fa-users" style="color: #a8a432; font-size: 1.2rem;"></i>&nbsp;&nbsp;<span style="color:#a8a432">' + currentHighSeeds + "</span>";
+            } else {
+                document.getElementById("seeds").innerHTML = '<i class="fas fa-users" style="color: #d10202; font-size: 1.2rem;"></i>&nbsp;&nbsp;<span style="color:#d10202">' + currentHighSeeds + "</span>";
+            }
             if (movie["mpa_rating"] != ""){
                 document.getElementById("mpa_rating").innerHTML = movie["mpa_rating"];
             } else {
