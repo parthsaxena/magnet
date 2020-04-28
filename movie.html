@@ -1,0 +1,743 @@
+<html>
+    <head>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+      <link rel="stylesheet" href="css/style.css">
+      <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <script src="js/general.js"></script>   
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.5.10/plyr.css" />         
+        <header>
+          <nav class="navbar navbar-expand-lg navbar-dark" style="background: black;" id="header">
+              <!-- Navbar brand -->
+              <a class="navbar-brand" href="#" style="position: relative;"><img src="img/logo.png" style="height: 30px;"></a>
+
+              <!-- Collapse button -->
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav" aria-controls="basicExampleNav"
+                  aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <!-- Collapsible content -->
+              <div class="collapse navbar-collapse" id="basicExampleNav">
+
+                  <!-- Links -->
+                  <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                      <a class="nav-link" href="trending"><strong>Trending</strong></a>
+                  </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="movies">For You
+                              <span class="sr-only">(current)</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="watching">Watching</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="my_list">My List</a>
+                      </li>
+                      <li class="nav-item">
+                        <div class="dropdown">
+                          <a class="nav-link dropdown-toggle genres_item" href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Genres</a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="background: black;">
+                              <a class="dropdown-item" href="genre?q=Comedy">Comedy</a>
+                              <a class="dropdown-item" href="genre?q=Action">Action</a>
+                              <a class="dropdown-item" href="genre?q=Horror">Horror</a>                              
+                              <a class="dropdown-item" href="genre?q=Drama">Drama</a>
+                              <a class="dropdown-item" href="genre?q=Romance">Romance</a>
+                              <a class="dropdown-item" href="genre?q=Mystery">Mystery</a>
+                              <a class="dropdown-item" href="genre?q=Animation">Animation</a>                              
+                            </div>
+                        </div>
+                      </li>
+                  </ul>
+                  <!-- Links -->
+
+                  <form class="form-inline" action="search" method="GET">
+                      <div class="md-form my-0" style=" position: relative; top: 5px;">
+                          <i class="fa fa-search" style="position: relative; left: 28px; color: #cebc8b;"></i>
+                          <input name="q" id="searchbar" class="form-control searchbar" type="text" placeholder="Search..." aria-label="Search" style="width: 300px; padding-left: 30px; border-bottom: 1px solid #cebc8b;">
+                      </div>
+                  </form>
+              </div>
+              <!-- Collapsible content -->
+
+          </nav>
+          <!--/.Navbar-->
+        </header>        
+        <style>                        
+            #recs {
+                display: none;
+            }
+            #cover_image {
+                display: none;
+                height: 360px;
+            }
+            #deets {
+                display: none;
+            }
+            .overlay_fade {
+                opacity: 0!important;
+                -webkit-transition: opacity .7s linear;
+                -ms-transition: opacity .7s linear;
+                transition: opacity .7s linear;
+            }
+            
+            .overlay_fade_in {
+                opacity: 1!important;
+                /*-webkit-transition: opacity .7s linear;
+                -ms-transition: opacity .7s linear;
+                transition: opacity .7s linear;*/
+            }
+            
+          .jumbotron_animate {
+            background: rgba(0, 0, 0, 0.6)!important;
+            -webkit-transition: background .7s linear;
+            -ms-transition: background .7s linear;
+            transition: background .7s linear;
+          }
+            
+        .jumbotron_animate_black {
+            background: rgba(0, 0, 0, 1)!important;;
+            -webkit-transition: background .7s linear;
+            -ms-transition: background .7s linear;
+            transition: background .7s linear;
+          }
+
+          #background {
+            height: 100vh;
+            width: 100vw;            
+            transition: opacity .7s ease-in;
+          }          
+
+          .bg-loading {
+            opacity: 0.6;
+          }   
+            .plyr {
+                width: 100%;
+                height:100%;
+                display: hidden;
+            }
+            .video {
+                width: 100%;
+                height:100%;
+            }
+            .spinner {
+                z-index: 10 !important; 
+            width: 100px;
+            height: 100px;
+
+            position: relative;  
+            }
+
+            .double-bounce1, .double-bounce2 {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #cebc8b;
+            opacity: 0.8;
+            position: absolute;
+            top: 0;
+            left: 0;
+            
+            -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+            animation: sk-bounce 2.0s infinite ease-in-out;
+            }
+
+            .double-bounce2 {
+            -webkit-animation-delay: -1.0s;
+            animation-delay: -1.0s;
+            }
+
+            @-webkit-keyframes sk-bounce {
+            0%, 100% { -webkit-transform: scale(0.0) }
+            50% { -webkit-transform: scale(1.0) }
+            }
+
+            @keyframes sk-bounce {
+            0%, 100% { 
+                transform: scale(0.0);
+                -webkit-transform: scale(0.0);
+            } 50% { 
+                transform: scale(1.0);
+                -webkit-transform: scale(1.0);
+            }
+            }
+
+            .centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* bring your own prefixes */
+            transform: translate(-50%, -50%);
+            }
+
+            .plyr--full-ui input[type=range] {
+            color: #cebc8b;
+            }
+
+            .plyr__control--overlaid {
+            background: rgba(206, 188, 139, .5);      
+            }
+
+            .plyr--video .plyr__control.plyr__tab-focus,
+            .plyr--video .plyr__control:hover,
+            .plyr--video .plyr__control[aria-expanded=true] {
+            background: #cebc8b;
+            }
+
+            .plyr__control.plyr__tab-focus {
+            box-shadow: 0 0 0 5px rgba(206, 188, 139, .5);            
+            }
+
+            .plyr__menu__container .plyr__control[role=menuitemradio][aria-checked=true]::before {
+            background: #cebc8b;
+            }
+            .overlay_dewey {
+                background-color: transparent;
+            }
+            .your-animation {
+                background-color: black !important;
+                -webkit-animation: your-animation-name 1s ease 0s 1 alternate !important;
+            }
+            //You have to add the vendor prefix versions for it to work in Firefox, Safari, and Opera.
+            @-webkit-keyframes your-animation-name {
+                from { background-color: #5EB4FE;}
+                to {background-color: #fff;}
+            }
+            -moz-animation: your-animation-name 1s ease 0s 1 alternate !important;
+            }
+            @-moz-keyframes your-animation-name {
+                from { background-color: #5EB4FE;}
+                to {background-color: #fff;}
+            }
+            -ms-animation: your-animation-name 1s ease 0s 1 alternate !important;
+            }
+            @-ms-keyframes your-animation-name {
+                from { background-color: #5EB4FE;}
+                to {background-color: #fff;}
+            }
+            -o-animation: your-animation-name 1s ease 0s 1 alternate !important;
+            }
+            @-o-keyframes your-animation-name {
+                from { background-color: #5EB4FE;}
+                to {background-color: #fff;}
+            }
+            animation: your-animation-name 1s ease 0s 1 alternate !important;
+            }
+            @keyframes your-animation-name {
+                from { background-color: #5EB4FE;}
+                to {background-color: #fff;}
+            }    
+            .jumbotron {
+                background-size: cover!important;            
+                background: black;
+                height: 100%!important;
+                width: 100%!important;
+              }              
+              .back_button {
+                background: none!important;
+                border: none;
+                padding: 0!important;
+                cursor: pointer;
+                border-radius: none!important;
+              }
+              .bg_fade {
+                  opacity: 0!important;
+                  -webkit-transition: opacity .7s linear;
+                  -ms-transition: opacity .7s linear;
+                  transition: opacity .7s linear;
+              }
+              .progress_line {
+                  width: 30%;
+                  height: 7px;
+                  background-color: rgba(255, 255, 255, 0.5);
+                  border-radius: 100px;
+              }
+              .progress {
+                  background: #cebc8b;
+                  height: 7px;
+                  border-radius: 100px;
+              }
+        </style>        
+    </head>
+    <body id="background" class="movie_details_background" style="overflow-y: hidden;">
+        <script src="js/plyr.js"></script>
+        
+        <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;" onclick="exitPlayer();"><</div></button>
+        
+        <div class="spinner centered loading_anim" style="display:none; z-index:10;">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+              </div> 
+        
+        <div class="modal" tabindex="-1" role="dialog" id="notify_delay" style="border-radius: none!important; z-index:10;">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <p class="modal-title text-center w-100" id="notify_message" style="color:black;">It may take a few minutes for this movie to start streaming.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div id="big_player" style="display: none!important; z-index: -1; opacity: 1;">
+        <video poster="" id="player" style="width=0; height=0;" playsinline controls>          
+
+                <script>  
+                    $("#player_exit").hide();
+                    $(".plyr").hover(function() {
+                      $(this).fadeIn(250);
+                    }, function() {
+                      $(this).fadeOut(250);
+                    });
+                    $( document ).ready(function() {
+                        //document.getElementById("big_player").innerHTML = '<video poster="" id="player" style="width=0; height=0; display: none!important;" playsinline controls></video>';
+                        $(".plyr").hide();                        
+                    });                   
+                    var bg_image = "";
+                    
+                    function watch() {       
+                        var jumbotron = document.getElementsByClassName("jumbotron")[0];
+                        var overlay = document.getElementsByClassName("overlay_dewey")[0]; 
+                        bg_image = document.getElementById("background").style.backgroundImage;
+                       $("#header").fadeOut(1000);
+                       $("#bg_layer").fadeTo(1000, 0);         
+                        setTimeout(function() { 
+                             $(".plyr").fadeIn(1000);
+                            player.play();
+                            $("#player_exit").fadeIn(1000);
+                            document.getElementById("big_player").style.display = "block"
+                            document.querySelector("video").style.display = "block"
+                            //exitPlayer();
+                        }, 1000);                          
+                                                                    
+                        return false;
+                    }
+                    
+                    function exitPlayer() {
+                                                
+                        player.pause();
+                        if (isLoadingOpen) {
+                            close_loading_modal();
+                        } 
+                        if (isNoticeOpen) {
+                            close_notice_modal();
+                        }
+                        
+                      $("#player_exit").fadeOut(1000);
+                      var overlay = document.getElementsByClassName("overlay_dewey")[0];
+                      overlay.classList.remove("overlay_fade");
+                      $("#header").fadeIn(1000);
+                        
+                        $( ".plyr" ).fadeOut("slow", function() {                            
+                            $(".plyr").fadeOut(1000);
+                            $("#bg_layer").fadeTo(500, 1);
+                        });         
+                        clearInterval(update_interval);
+                    }
+                    
+                    const IMDB_ID = "{{imdb_id}}"
+                    var movieID = IMDB_ID;
+                    let {remote} = require('electron');                    
+                    //remote.getGlobal("serve_movie")(IMDB_ID);
+                    var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");         
+            
+                    remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
+                      .then(res => {
+                        for (sub of res) {
+                            var abs_path = sub["path"];            
+                            if (abs_path != '') {
+                                if (sub["lang"] == 'english') {                                    
+                                    var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "english");
+                                    document.getElementById("player").innerHTML += `<track kind="captions" label="English" src="` + remote_path + `" srclang="en" default />`;                       
+                                    console.log("found english sub" + remote_path);
+                                    console.log("PATH:" + abs_path);
+                                } else if (sub["lang"] == 'spanish') {
+                                    var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "spanish");
+                                    document.getElementById("player").innerHTML += `<track kind="captions" label="Spanish" src="` + remote_path + `" srclang="es" default />`;                          
+                                    console.log("found spanish sub" + remote_path);
+                                    console.log("PATH:" + abs_path);
+                                } else if (sub["lang"] == 'chinese') {
+                                    var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "chinese");
+                                    document.getElementById("player").innerHTML += `<track kind="captions" label="Chinese" src="` + remote_path + `" srclang="zh" default />`;                          
+                                    console.log("found chinese sub" + remote_path);
+                                    console.log("PATH:" + abs_path); 
+                                }
+                            }
+                        }                        
+                      })
+                      .catch(error => {});
+                                        
+                    const PROVIDED_TIMESTAMP = {{timestamp}};
+                    const DURATION = {{duration}};
+                    var f = PROVIDED_TIMESTAMP + 10;
+                    var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
+                    var B_URL = "http://localhost:3000/stream_" + IMDB_ID;    
+                    //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
+                    //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";               
+                    if (PROVIDED_TIMESTAMP != 0) {
+                        document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';   
+                    } else {
+                        document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';   
+                    }           
+                </script>                                                    
+                </video>
+                </div>
+      <div id="general_layer">
+      <div id="bg_layer">
+      <div class="jumbotron jumbotron-fluid">
+        <div class="card-overlay">
+        <div class="container-fluid">
+            <!-- Modal -->
+            <div class="modal" tabindex="-1" role="dialog" id="notify" style="border-radius: none!important; ">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <p class="modal-title text-center w-100" id="notify_ar">Your movie has been added!</p>
+                  </div>
+                </div>
+              </div>
+            </div>        
+            <div class="overlay_dewey">                                     
+            <button style="position: relative; bottom: 45px;" onclick="previousPage(); return false;" class="circle-back"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</button>
+          <center>
+            <div class="row" style="position: relative; bottom: 55px;">
+              <div class="col-6" style="">
+                <img src="" id="cover_image" style="position: relative; bottom: 0px; box-shadow: 1px 15px 10px black;">
+              </div>
+              <div class="col-6" style="text-align: left; position: relative; bottom: -15px; padding-bottom: 20px;" id="deets">
+                  <h4 id="movie_title"></h4><div id="space"></div>
+                  <div style="position: relative;">
+                  <div class="progress_line" style="display: inline-block;">
+                    <div class="progress" style=""></div>
+                  </div></div><i style="display: inline-block; position: relative; left: 210px; bottom: 15px;" id="progress_text"></i><br>
+                  <div style="position: relative; bottom: 15px;">
+                  <div id="genres"></div>
+                  <div style="font-weight: bold; padding-top: 10px; padding-bottom: 10px;">
+                  <div id="mpa_rating" style="display: inline; border: 1px solid #cebc8b; padding-right: 5px; padding-left: 5px; font-size: 15px; padding-top: 1px; padding-bottom: 1px; font-family: Arial;"></div>&nbsp;
+                  <div id="rating" style="display: inline;"><i class="fa fa-star" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
+                  &nbsp;<div id="year" style="display: inline;"><i class="fa fa-calendar" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
+                  &nbsp;<div id="runtime" style="display: inline;"><i class="fa fa-clock-o" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
+                  </div>
+                  <p id="movie_summary" style="max-width: 500px; position: relative; top: 10px; max-height: 95px; overflow-y: scroll; padding-right: 5px;"></p><br>
+                  <div style="position: relative; bottom: 10px;">
+                  <div id="cast">Starring: </div><br>
+                  <a class="btn btn-outline" onclick="watch();" id="watch_button"><i class="fa fa-play" style=""></i>&nbsp;&nbsp;Watch</a>&nbsp;
+                  <a class="btn btn-outline" id="mylist_button" onclick="added()"><i class="fa fa-plus" style=""></i>&nbsp;&nbsp;My List</a>
+                  </div>
+                </div>
+              </div>
+                <br><br>
+                <div id="recs" style="width: 70%; position: relative; left: 15%; top: 50px;"><h4 style="text-align: left; position: relative; right: 15px;">Similar Titles</h4></div>
+            </div>
+          </center>
+          </div>
+        </div>
+          </div>
+          </div>
+        </div>
+      </div>
+        <script>                              
+            const Http = new XMLHttpRequest();
+            const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings']});            
+            var details_bg = "";    
+            const url='http://localhost:3000/completed_movie?q=' + IMDB_ID;
+            const update_url = 'http://localhost:3000/update_watching?id=' + IMDB_ID + '&timestamp=';
+            var update_interval; 
+                        
+            player.on('timeupdate', event => {
+                var difference = player.duration - player.currentTime;
+                //console.log("Updated current time: " + player.currentTime + "; Duration: " + player.duration + "; Difference: " + difference);   
+                
+                if (difference < 600 && !COMPLETED && player.currentTime != 0) {
+                    Http.open("GET", url);
+                    Http.send();
+                    COMPLETED = true;
+                    Http.onreadystatechange = (e) => {
+                        if (this.readyState == 4) {
+                            console.log("Completed: " + Http.responseText);                            
+                        } else {
+                            console.log("not there");
+                        }
+                    }
+                }
+            });
+            
+            player.on('controlsshown', event => {
+                //$("#player_exit").fadeIn(1000);
+            });
+            
+            player.on('controlshidden', event => {
+                /*setTimeout(function() {
+                  $("#player_exit").fadeOut(1000);  
+                }, 1000);*/                
+            });
+            
+            player.on('ended', event => {
+                if (!COMPLETED) {
+                    Http.open("GET", url);
+                    Http.send();
+                    COMPLETED = true;
+                    clearInterval(update_interval);
+                    Http.onreadystatechange = (e) => {
+                        if (this.readyState == 4 && this.status == 200) {
+                            console.log("Completed: " + Http.responseText);
+                        }
+                    }
+                }
+            });
+
+            var isFirstTime = true;
+            player.on('waiting', event => {
+                if (isFirstTime) {
+                    open_notice_modal();                          
+                }
+                console.log("We're waiting");
+                open_loading_modal();
+            });
+            
+            var hasPlayed = false;            
+            player.on('playing', event => {      
+                if (!hasPlayed) { 
+                    hasPlayed = true;                                        
+                    update_interval = setInterval(function() {
+                        Http.open("GET", update_url + player.currentTime + '&duration=' + player.duration);
+                        Http.send();                                                
+                    }, 15 * 1000);
+                }
+                console.log("We're playing");
+                close_loading_modal();
+                if (isFirstTime) {
+                    close_notice_modal();
+                    isFirstTime = false;
+                }
+            });
+            player.on('pause', event => {
+                console.log("We're playing");
+                close_loading_modal();
+            });
+            
+            function shorten_summary(summary){
+                if (summary.length > 500){
+                    return summary.substring(0, 500);
+                } 
+                return summary;
+            }
+            var movie = {{json_string}};
+            var recsObj = {{recs}};
+            // Updates progress of movie
+            var percent_complete = Math.round(100*PROVIDED_TIMESTAMP/DURATION);
+            $(".progress").css("width", percent_complete+"%");
+            if (percent_complete < 1){
+              $(".progress_line").hide();
+              document.getElementById("space").innerHTML = "<br>";
+            } else {
+              document.getElementById("progress_text").innerHTML = percent_complete+"%";
+                document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
+            }
+            //document.getElementById("background").style = "background: url("+movie["background_image"]+");"
+            var castList =  movie["cast"];
+            if (castList.length != 0) {      
+                var cast_string = "";
+                for (var i = 0; i < castList.length; i++){
+                    var name = castList[i]["name"];
+                    if (i < (castList.length - 1)){
+                        cast_string += name+", ";
+                    } else {
+                        cast_string += name;
+                    }
+                }
+                document.getElementById("cast").innerHTML += "<i>"+cast_string+"</i>";
+            } else {
+                document.getElementById("cast").innerHTML = "";
+            }
+            
+            if (movie["genres"].length > 0){
+                var genres_list = "";
+                for (var index in movie["genres"]){
+                    var genre = movie["genres"][index];
+                    if (index < (movie["genres"].length-1)){
+                        genres_list += genre+",&nbsp;&nbsp;";
+                    } else {
+                        genres_list += genre;
+                    }
+                }
+                document.getElementById("genres").innerHTML = genres_list;
+            }
+            var on_list;
+            if (movie["on_list"] == "true") {
+              on_list = true;
+              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-times" style=""></i>&nbsp;&nbsp;Remove';              
+            } else {
+              on_list = false;
+              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-plus" style=""></i>&nbsp;&nbsp;My List';              
+            }
+            
+            document.getElementById("movie_title").innerHTML = movie["title"];
+            document.getElementById("movie_summary").innerHTML = (movie["synopsis"]);
+            /*var background_image = document.getElementById("background");
+            background_image.addEventListener("load", fadeImg);*/
+            
+            details_bg = movie["background_image"];
+
+            var bgElement = document.getElementById("background");
+            var jumbotron = document.getElementsByClassName("jumbotron")[0];
+            //bgElement.classList.add("bg-loading");
+            var preloaderImage = document.createElement("img");
+            preloaderImage.src = movie["background_image"]
+            preloaderImage.addEventListener('load', (event) => {
+              bgElement.classList.remove("bg-loading");
+              jumbotron.classList.add("jumbotron_animate");
+              //bgElement.style.backgroundImage = `url(${movie["background_image"]})`;
+              document.getElementById("bg_layer").style.backgroundImage = `url(${movie["background_image"]})`;
+              preloaderImage = null;
+            });            
+            
+            fadeInMovieDetails();
+            function fadeInMovieDetails() {
+                $("#deets").fadeIn(400); 
+                $("#cover_image").fadeIn(400);
+                $("#recs").fadeIn(400); 
+            }
+            function fadeImg () {
+              this.style.transition = "opacity 0.7s";
+              this.style.opacity = "1";
+            }
+            
+            function getTimeStamp(minutes){
+                var hours = Math.floor(minutes/60);
+                var min_rem = minutes%60;
+                if (hours < 1){
+                    return min_rem + " min";
+                } else if (hours == 1){
+                    return hours + " hr "+ min_rem + " min";
+                } else {
+                    return hours + " hrs "+ min_rem + " min";
+                }
+            }
+
+            //document.getElementById("watch_button").href = "stream_id?q={{watch_id}}";
+            //document.getElementById("mylist_button").href = "add_to_list?q={{add_id}}";
+            
+            if (movie["mpa_rating"] != ""){
+                document.getElementById("mpa_rating").innerHTML = movie["mpa_rating"];
+            } else {
+                document.getElementById("mpa_rating").innerHTML = "NR";
+            }
+            document.getElementById("rating").innerHTML += movie["rating"]+"/10";
+            document.getElementById("year").innerHTML += movie["year"];
+            document.getElementById("runtime").innerHTML += getTimeStamp(movie["runtime"]);
+            
+            function truncate(str, no_words) {
+                return str.split(" ").splice(0,no_words).join(" ");
+            }
+            
+            // Recommendations
+            var movies_for_you = recsObj;
+            var movies = document.getElementById("recs");
+            var keys = Object.keys(movies_for_you);
+            var content = "";
+            var numDisplayed = 8;
+            for (var i = 0; i < keys.length; i++) {
+                var movie_r = movies_for_you[keys[i]]
+                console.log("Found movie: " + keys[i])
+                // Number of columns after which it breaks to a new row
+                colBreakPt = 8;
+                colNumber = 1;
+                //movies.innerHTML += inner;
+                if (i%colBreakPt == 0) {
+                    // new row
+                    var synopsis = truncate(movie_r["synopsis"], 30) + "...";
+                    content += '<div class="row mx-md-n3"><div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie_r["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie_r["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
+                    //movies.innerHTML += '
+                } else if (i%colBreakPt == 7) {
+                    // end of row
+                    var synopsis = truncate(movie_r["synopsis"], 30) + "...";
+                    content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie_r["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie_r["medium_cover_image"] + '" alt="Movie Cover"></div></div></div></div>';
+                } else {
+                    // middle of row
+                    var synopsis = truncate(movie_r["synopsis"], 30) + "...";
+                    content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie_r["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie_r["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
+                }
+            }
+            movies.innerHTML += content;                        
+
+            function added() {
+              var imdb_code = movie["imdb_code"];
+              fetch("http://localhost:3000/add_to_list?q="+imdb_code);
+              var message = document.getElementById("notify_ar");
+              if (on_list) {
+                message.innerHTML = "Movie removed from your list!";
+                document.getElementById("mylist_button").innerHTML = '<i class="fa fa-plus" style=""></i>&nbsp;&nbsp;My List';
+                on_list = false;
+              } else {
+                message.innerHTML = "Movie added to your list!";
+                document.getElementById("mylist_button").innerHTML = '<i class="fa fa-times" style=""></i>&nbsp;&nbsp;Remove'; 
+                on_list = true;
+              }
+              open_modal();
+            }
+            
+            function open_modal(){
+                $(function() {
+                  $("#notify").fadeIn("fast", function() { $(this).delay(1000).fadeOut("slow"); });
+               });
+            }
+            
+            function close_modal(){
+                $(function() {
+                  $("#notify").fadeOut();
+               });
+            }
+            
+            var isNoticeOpen = false;
+            function open_notice_modal(){
+                $(function() {
+                  $("#notify_delay").fadeIn(500);
+               });
+                isNoticeOpen = true;
+            }
+
+            function close_notice_modal(){
+                $(function() {
+                  $("#notify_delay").fadeOut(500);
+               });
+                isNoticeOpen = false;
+            }
+            
+            var isLoadingOpen = false;
+            function open_loading_modal(){
+                $(function() {
+                  $(".loading_anim").fadeIn(500);
+               });
+                isLoadingOpen = true;
+            }
+            
+            function close_loading_modal(){
+                $(function() {
+                  $(".loading_anim").fadeOut(500);
+               });
+                isLoadingOpen = false;
+            }
+            
+            const images = document.getElementsByClassName("card-img-top");
+            for (let img of images) {
+              img.addEventListener("load", fadeImg);
+              img.style.opacity = "0";
+            }
+
+            var cover = document.getElementById("cover_image");
+            cover.src = movie["medium_cover_image"];
+            cover.addEventListener("load", fadeImg);
+            cover.style.opacity = "0";
+            
+        </script>        
+          <script>                                      
+          </script>
+    </body>
+</html>

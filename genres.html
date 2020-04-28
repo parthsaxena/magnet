@@ -1,0 +1,152 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/style.css">      
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="js/general.js"></script>
+        <script>function link_movieDetails(movie_id){ location.href = 'movie?q='+movie_id;}function findGetParameter(parameterName) { var result = null, tmp = []; location.search .substr(1) .split("&") .forEach(function (item) { tmp = item.split("="); if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]); }); return result;}function signInUser(){ var email = document.getElementById("login_email").value; var password = document.getElementById("login_password").value; firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) { var errorCode = error.code; var errorMessage = error.message; document.getElementById("login_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage) });}function createUser_RDB(user_id, email){ firebase.database().ref("users/"+user_id).set({ user_id: user_id, email: email, });}function signUpUser(){ var email = document.getElementById("signup_email").value; var password = document.getElementById("signup_password").value; firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){ firebase.auth().signInWithEmailAndPassword(email, password).then(function(error){ console.log("Error code: "+ error.code); console.log("Error message: "+error.message); }); firebase.auth().onAuthStateChanged(function(user) { if (user) { createUser_RDB(user.uid, user.email); console.log("User created in realtime db."); } else { console.log("User is not signed in."); } }); }).catch(function(error){ var errorCode = error.code; var errorMessage = error.message; document.getElementById("signup_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage); });}</script>
+        <header id="header">
+          <nav class="navbar navbar-expand-lg navbar-dark" style="background: black;">
+              <!-- Navbar brand -->
+              <a class="navbar-brand" href="#"><img src="img/logo.png" style="height: 30px;"></a>
+
+              <!-- Collapse button -->
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav" aria-controls="basicExampleNav"
+                  aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <!-- Collapsible content -->
+              <div class="collapse navbar-collapse" id="basicExampleNav">
+
+                  <!-- Links -->
+                  <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                      <a class="nav-link" href="trending"><strong>Trending</strong></a>
+                  </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="movies">For You
+                              <span class="sr-only">(current)</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="watching">Watching</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="my_list">My List</a>
+                      </li>
+                      <li class="nav-item">
+                        <div class="dropdown">
+                          <a class="nav-link dropdown-toggle genres_item active" href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <strong>Genres</strong></a>
+                          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="background: black;">
+                            <a class="dropdown-item" href="genre?q=Comedy">Comedy</a>
+                              <a class="dropdown-item" href="genre?q=Action">Action</a>
+                              <a class="dropdown-item" href="genre?q=Horror">Horror</a>                              
+                              <a class="dropdown-item" href="genre?q=Drama">Drama</a>
+                              <a class="dropdown-item" href="genre?q=Romance">Romance</a>
+                              <a class="dropdown-item" href="genre?q=Mystery">Mystery</a>
+                              <a class="dropdown-item" href="genre?q=Animation">Animation</a>     
+                          </div>
+                        </div>
+                      </li>
+                  </ul>
+                  <!-- Links -->
+
+                  <form class="form-inline" action="search" method="GET">
+                      <div class="md-form my-0" style=" position: relative; top: 5px;">
+                          <i class="fa fa-search" style="position: relative; left: 28px; color: #cebc8b;"></i>
+                          <input name="q" id="searchbar" class="form-control searchbar" type="text" placeholder="Search..." aria-label="Search" style="width: 300px; padding-left: 30px; border-bottom: 1px solid #cebc8b;">
+                      </div>
+                  </form>
+              </div>
+              <!-- Collapsible content -->
+
+          </nav>
+          <!--/.Navbar-->
+        </header>
+    </head>
+    <body class="background">
+        <div class="container-fluid" id="movies" style="max-width: 99.3%; position: relative; top: 5px;">
+          <!--<h4 style="position: relative; top: 10px; color: white;">Comedy</h4><br>-->
+            <script>
+                function truncate(str, no_words) {
+                    return str.split(" ").splice(0,no_words).join(" ");
+                }
+
+                function findGetParameter(parameterName) {
+                    var result = null,
+                        tmp = [];
+                    location.search
+                        .substr(1)
+                        .split("&")
+                        .forEach(function (item) {
+                        tmp = item.split("=");
+                        if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+                        });
+                    return result;
+                }
+
+                var movies_for_you = {{json_string}};
+                    var movies = document.getElementById("movies");
+                    var genre_param = findGetParameter("q");
+                    document.getElementById("dropdownMenuButton").innerHTML = genre_param + " Movies";
+                    var keys = Object.keys(movies_for_you);
+                    var content = "";
+                    for (var i = 0; i < keys.length; i++) {
+                        var movie = movies_for_you[keys[i]]
+                        console.log("Found movie: " + keys[i])
+                        // Number of columns after which it breaks to a new row
+                        colBreakPt = 8;
+                        colNumber = 1;
+                        //movies.innerHTML += inner;
+                        if (i%colBreakPt == 0) {
+                            // new row
+                            var synopsis = truncate(movie["synopsis"], 30) + "...";
+                            content += '<div class="row mx-md-n3"><div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
+                            //movies.innerHTML += '
+                        } else if (i%colBreakPt == 7) {
+                            // end of row
+                            var synopsis = truncate(movie["synopsis"], 30) + "...";
+                            content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></div></div></div>';
+                        } else {
+                            // middle of row
+                            var synopsis = truncate(movie["synopsis"], 30) + "...";
+                            content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
+                        }
+                    }
+                    movies.innerHTML += content;
+
+                    const images = document.getElementsByClassName("card-img-top");
+                    for (let image of images) {
+                      image.addEventListener("load", fadeImg);
+                      image.style.opacity = "0";
+                    }
+
+                    function fadeImg () {
+                      this.style.transition = "opacity 0.7s";
+                      this.style.opacity = "1";
+                    }
+            </script>
+            <style>
+              .card {
+                border-radius: 0px!important;
+                border: none;
+              }
+              .card-img-top {
+                border-radius: 0px!important;
+              }
+              button {
+                background: none!important;
+                border: none;
+                padding: 0!important;
+                cursor: pointer;
+              }
+            </style>
+        </div>
+    </body>
+</html>

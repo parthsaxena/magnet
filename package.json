@@ -1,0 +1,26 @@
+{
+  "name": "Magnet",
+  "productName": "Magnet",
+  "version": "1.0.0",
+  "main": "backend.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "electron-progressbar": "^1.2.0",
+    "express": "^4.17.1",
+    "firebase": "^7.14.2",
+    "jquery": "^3.5.0",
+    "request": "^2.88.2",
+    "request-progress": "^3.0.0",
+    "torrent-stream": "^1.2.0",
+    "yifysubtitles": "^2.1.5"
+  },
+  "devDependencies": {
+    "electron": "^8.2.3"
+  },
+  "description": ""
+}
