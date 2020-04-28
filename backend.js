@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 global.path = require('path');
 const cors = require('cors');
 const parseRange = require('range-parser');
@@ -10,7 +9,6 @@ const electron = require('electron');
 const ProgressBar = require('electron-progressbar');
 const request = require('request');
 global.yifysubtitles = require('yifysubtitles');
-var progress = require('request-progress');
 
 // analytics
 var firebase = require("firebase/app");
@@ -469,7 +467,7 @@ function createWindow() {
         win.webContents.openDevTools();
     })*/
 
-    //window.webContents.openDevTools();
+    //window.webContents.openDevTools();    
 }
 
 //

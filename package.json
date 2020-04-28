@@ -16,7 +16,6 @@
     "jquery": "^3.5.0",
     "progress-stream": "^2.0.0",
     "request": "^2.88.2",
-    "request-progress": "^3.0.0",
     "torrent-stream": "^1.2.0",
     "yifysubtitles": "^2.1.5"
   },
