@@ -520,7 +520,7 @@ app.get('/movie', cors(), function(request, response) {
     
     
     var values = {"json_string": JSON.stringify(json), "watch_id": imdb_id, "add_id": imdb_id, "recs": JSON.stringify(recs), "imdb_id": imdb_id, "timestamp": 0, "duration": 1};
-    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'movie.html'), 'utf8');
+    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movie.html'), 'utf8');
     if (Object.keys(history_db).includes(imdb_id)) {
         // user has watched, provide timestamp
         console.log("PROVIDING TIMESTAMP: " + history_db[imdb_id]["timestamp"])
@@ -539,7 +539,7 @@ app.get('/watching', cors(), function(request, response) {
     var watched = JSON.stringify(history_db);
 
     var values = {"json_string": watched};
-    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(),'watched.html'), 'utf8');
+    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'watched.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
     fb_updateWatched();
@@ -552,7 +552,7 @@ app.get('/my_list', cors(), function(request, response) {
     var my_list = JSON.stringify(mylist_db);
 
     var values = {"json_string": my_list};
-    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(),'my_list.html'), 'utf8');
+    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'my_list.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
     fb_updateMyList();
@@ -688,7 +688,7 @@ app.get('/trending', cors(), function(request, response) {
   }
 
     var values = {"json_string": JSON.stringify(trendingObj)};
-    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(),'trending.html'), 'utf8');
+    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'trending.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
     fb_updateTrending();
@@ -724,7 +724,7 @@ app.get('/movies', cors(), function(request, response) {
     response.set('Content-Type', 'text/html');
 
     var values = {"json_string": JSON.stringify(recsObj)};
-    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'movies.html'), 'utf8');
+    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movies.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
     fb_updateForYou();
@@ -762,7 +762,7 @@ app.get('/genre', cors(), function(request, response) {
 
     var genre_json = JSON.stringify(limitedObj);
     var values = {"json_string": genre_json};
-    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(),'genres.html'), 'utf8');
+    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'genres.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
     fb_updateGenres(query);
@@ -792,7 +792,7 @@ app.get('/search', cors(), function(request, response){
     }
 
     var values = {"json_string": JSON.stringify(json)};
-    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(),'search.html'), 'utf8');
+    var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'search.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
     fb_updateSearchQueries(query);

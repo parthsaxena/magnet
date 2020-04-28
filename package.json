@@ -2,7 +2,7 @@
   "name": "Magnet",
   "productName": "Magnet",
   "version": "1.0.0",
-  "main": "backend.js",
+  "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
