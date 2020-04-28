@@ -73,6 +73,7 @@ a.dropdown-item:hover {
   background: #0f0f0f;
   border: none;
   cursor: pointer;
+  border-radius: 0px!important;
 }
 
 .card:hover {

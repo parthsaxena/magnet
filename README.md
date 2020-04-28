@@ -32,5 +32,5 @@
 </div>
 <div id="contact">
   <h2>Contact Us</h2>
-  <p align="left">Reach out to us at <code>me@parthsaxena.com</code></p>
+    <p align="left">Reach out to us at <code>magnet@socifyinc.com</code><br>Developed by <a href="http://parthsaxena.com">Parth Saxena</a> & <a href="https://www.instagram.com/anshulpanda/">Anshul Panda</p>
 </div>

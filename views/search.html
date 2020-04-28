@@ -126,16 +126,16 @@
                             if (i%colBreakPt == 0) {
                                 // new row
                                 var synopsis = truncate(movie["synopsis"], 30) + "...";
-                                content += '<div class="row mx-md-n3"><div class="col-'+colNumber+' px-md-3 padding-2"><button onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></button></div>';
+                                content += '<div class="row mx-md-n3"><div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
                                 //movies.innerHTML += '
                             } else if (i%colBreakPt == 7) {
                                 // end of row
                                 var synopsis = truncate(movie["synopsis"], 30) + "...";
-                                content += '<div class="col-'+colNumber+' px-md-3 padding-2"><button onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></button></div></div>';
+                                content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></div></div></div>';
                             } else {
                                 // middle of row
                                 var synopsis = truncate(movie["synopsis"], 30) + "...";
-                                content += '<div class="col-'+colNumber+' px-md-3 padding-2"><button onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></button></div>';
+                                content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
                             }
                         }
                         movies_html.innerHTML += content;
