@@ -21,7 +21,9 @@
                   <span class="navbar-toggler-icon"></span>
               </button>
 
-              <!-- Collapsible content -->
+              <!-- Collapsible content 
+              Note: might want to fade body out
+              -->
               <div class="collapse navbar-collapse" id="basicExampleNav">
 
                   <!-- Links -->
@@ -30,7 +32,7 @@
                       <a class="nav-link" href="trending">Trending</a>
                   </li>
                       <li class="nav-item">
-                          <a class="nav-link" href="movies">For You
+                          <a class="nav-link" href="movies" onclick="">For You
                               <span class="sr-only">(current)</span>
                           </a>
                       </li>
@@ -255,7 +257,7 @@
                   transition: opacity .7s linear;
               }
               .progress_line {
-                  width: 30%;
+                  width: 200px;
                   height: 7px;
                   background-color: rgba(255, 255, 255, 0.5);
                   border-radius: 100px;
@@ -300,6 +302,7 @@
         <video poster="" id="player" style="width=0; height=0;" playsinline controls>          
 
                 <script>  
+                    var current_time = 0;
                     $("#player_exit").hide();
                     $(".plyr").hover(function() {
                       $(this).fadeIn(250);
@@ -311,9 +314,25 @@
                         $(".plyr").hide();                        
                     });                   
                     var bg_image = "";
-                    var isInPlayer = false;                    
+                    var isInPlayer = false; 
+
+                    // Might use later to fadeOut the pages from movie.html
+                    function fadeBody(){
+                      /*$("#bg_layer").fadeOut();
+                      location.href = "movies";*/
+                    }                   
                                         
                     function exitPlayer() {
+                        console.log("Player exited at: "+ current_time);
+                        var updated_percent = Math.round(100*(current_time/60)/(movie["runtime"]));
+                        $(".progress").css("width", updated_percent+"%");
+                        if (updated_percent >= 1){
+                          document.getElementById("space").innerHTML = "";
+                          $(".progress_line").show();
+                          document.getElementById("progress_text").innerHTML = updated_percent+"%";
+                          document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
+                        }
+
                         isInPlayer = false;             
                         player.pause();
                         if (isLoadingOpen) {
@@ -343,6 +362,7 @@
             
                     const PROVIDED_TIMESTAMP = {{timestamp}};
                     const DURATION = {{duration}};
+                    //function 
                     function watch() {                          
                         var f = PROVIDED_TIMESTAMP + 10;
                         var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
@@ -467,6 +487,7 @@
                         
             player.on('timeupdate', event => {
                 var difference = player.duration - player.currentTime;
+                current_time = player.currentTime;
                 //console.log("Updated current time: " + player.currentTime + "; Duration: " + player.duration + "; Difference: " + difference);   
                 
                 if (difference < 600 && !COMPLETED && player.currentTime != 0) {
@@ -484,7 +505,9 @@
             });
             
             player.on('controlsshown', event => {
-                $("#player_exit").fadeIn(1000);
+                if (isInPlayer){
+                  $("#player_exit").fadeIn(1000);
+                } 
             });
             
             player.on('controlshidden', event => {
@@ -559,7 +582,7 @@
               $(".progress_line").hide();
               document.getElementById("space").innerHTML = "<br>";
             } else {
-              document.getElementById("progress_text").innerHTML = percent_complete+"%";
+                document.getElementById("progress_text").innerHTML = percent_complete+"%";
                 document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
             }
             //document.getElementById("background").style = "background: url("+movie["background_image"]+");"

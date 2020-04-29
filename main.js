@@ -532,7 +532,7 @@ function createWindow() {
       electron.shell.openExternal(url);
     });
 
-    //window.webContents.openDevTools();    
+    window.webContents.openDevTools();    
 }
 
 //
@@ -773,10 +773,10 @@ app.get('/movies', cors(), function(request, response) {
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movies.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
+    destroy_engine();
     fb_updateForYou();
     response.write(html_content);
     response.end();
-    destroy_engine();
 
 });
 
