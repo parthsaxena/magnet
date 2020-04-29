@@ -532,7 +532,7 @@ function createWindow() {
       electron.shell.openExternal(url);
     });
 
-    window.webContents.openDevTools();    
+    //window.webContents.openDevTools();    
 }
 
 //
@@ -549,7 +549,7 @@ app.get('/movie', cors(), function(request, response) {
       json["on_list"] = "true";
     } else {
       json["on_list"] = "false";
-    }
+    }        
     
     var recs = getRecs(imdb_id, 1);
 
@@ -562,8 +562,7 @@ app.get('/movie', cors(), function(request, response) {
       for (var i = 0; i < 8; i++) {
         limitedObj[keys[i]] = sortedObj[keys[i]]
       }      
-      recs = limitedObj;
-    
+      recs = limitedObj;        
     
     var values = {"json_string": JSON.stringify(json), "watch_id": imdb_id, "add_id": imdb_id, "recs": JSON.stringify(recs), "imdb_id": imdb_id, "timestamp": 0, "duration": 1};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movie.html'), 'utf8');
@@ -578,7 +577,8 @@ app.get('/movie', cors(), function(request, response) {
     fb_updateMovieDetails(imdb_id);
     
     response.write(html_content);
-    response.end();
+    response.end();   
+    destroy_engine();
 });
 
 app.get('/watching', cors(), function(request, response) {
@@ -772,12 +772,11 @@ app.get('/movies', cors(), function(request, response) {
     var values = {"json_string": JSON.stringify(recsObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movies.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-
-    destroy_engine();
+    
     fb_updateForYou();
     response.write(html_content);
     response.end();
-
+    destroy_engine();
 });
 
 app.get('/genre', cors(), function(request, response) {
@@ -877,8 +876,17 @@ global.serve_subtitle_track = function(localURL, movie_id, language) {
 var streamingEndpoint = "";
 global.streaming = false;
 global.magengine;
-global.serve_movie = function(id) {    
-    destroy_engine();    
+global.serve_movie = function(id) {  
+    tmpEndpoint = '/stream_' + id
+    if (streaming && streamingEndpoint != tmpEndpoint) {
+        magengine.remove(function() {
+            console.log("[Engine] Removed Files");
+            magengine.destroy(function() {
+                console.log("[Engine] Destroyed Engine");
+                streaming = false;
+            }); 
+        });        
+    }    
     streamingEndpoint = '/stream_' + id
     app.get('/stream_' + id, function(request, response) {
             const range = request.headers.range;
