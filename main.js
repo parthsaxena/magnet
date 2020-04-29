@@ -27,7 +27,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
-const VERSION = "1.0.0";
+const VERSION = "1.0.1";
 const PORT = 3000;
 var window;
 
@@ -171,10 +171,8 @@ function getNetwork() {
 function start() {    
     request('http://magnet.socifyinc.com/stable/db_version.json', function (error, response, body) {      
       var version_json = JSON.parse(body);
-      var version_string = version_json["version"];
-        version_string = "1.0.2";
+      var version_string = version_json["version"];        
       console.log("Latest DB Version: " + version_string);
-      
       if (fs.existsSync(path.join(getAppDataPath(), 'db.json'))) {
         fs.readFile(path.join(getAppDataPath(), 'db.json'), 'utf8', function (err, data) {
           if (err) throw err;
