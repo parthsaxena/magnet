@@ -9,6 +9,7 @@ const electron = require('electron');
 const ProgressBar = require('electron-progressbar');
 const request = require('request');
 global.yifysubtitles = require('yifysubtitles');
+const http = require('http');
 
 // analytics
 var firebase = require("firebase/app");
@@ -40,47 +41,11 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-if (!fs.existsSync(getAppDataPath())) {
-    fs.mkdirSync(getAppDataPath());
-    fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
-} else {
-     fs.rmdir(path.join(getAppDataPath(), "streams"), { 
-      recursive: true, 
-        }, (error) => { 
-          if (error) { 
-            console.log(error); 
-          } else { 
-            console.log("Wiped Streams"); 
-          }
-        });    
-    if (!fs.existsSync(path.join(getAppDataPath(), 'subtitles'))) {
-        fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
-    } else {
-        fs.rmdir(path.join(getAppDataPath(), "subtitles"), { 
-          recursive: true, 
-            }, (error) => { 
-              if (error) { 
-                console.log(error); 
-              } else { 
-                console.log("Wiped Subtitles"); 
-                fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
-              }
-            });
-    }
-}
-if (fs.existsSync("/tmp/torrent-stream")) {    
-    fs.rmdir("/tmp/torrent-stream", { 
-      recursive: true, 
-        }, (error) => { 
-          if (error) { 
-            console.log(error); 
-          } else { 
-            console.log("Wiped tmp"); 
-          }
-        }); 
-} else {
-    console.log("No tmp folder found");
-}
+cleanDirectories();
+
+var final_ip = "";
+var final_location = "";
+getNetwork();
 
 var recsNeedUpdate = true;
 
@@ -136,6 +101,72 @@ electron.app.on("ready", function() {
         }
     });
 });
+
+function cleanDirectories() {
+    if (!fs.existsSync(getAppDataPath())) {
+        fs.mkdirSync(getAppDataPath());
+        fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
+    } else {
+     fs.rmdir(path.join(getAppDataPath(), "streams"), { 
+      recursive: true, 
+        }, (error) => { 
+          if (error) { 
+            console.log(error); 
+          } else { 
+            console.log("Wiped Streams"); 
+          }
+        });    
+    if (!fs.existsSync(path.join(getAppDataPath(), 'subtitles'))) {
+        fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
+    } else {
+        fs.rmdir(path.join(getAppDataPath(), "subtitles"), { 
+          recursive: true, 
+            }, (error) => { 
+              if (error) { 
+                console.log(error); 
+              } else { 
+                console.log("Wiped Subtitles"); 
+                fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
+              }
+            });
+    }
+    }
+    if (fs.existsSync("/tmp/torrent-stream")) {    
+    fs.rmdir("/tmp/torrent-stream", { 
+      recursive: true, 
+        }, (error) => { 
+          if (error) { 
+            console.log(error); 
+          } else { 
+            console.log("Wiped tmp"); 
+          }
+        }); 
+    } else {
+        console.log("No tmp folder found");
+    }
+}
+
+function getNetwork() {
+    http.get('http://www.geoplugin.net/json.gp', (resp) => {
+      let data = '';  
+      resp.on('data', (chunk) => {
+        data += chunk;
+      });  
+      resp.on('end', () => {    
+        var json = JSON.parse(data);
+        var ip = json["geoplugin_request"];
+        var city = json["geoplugin_city"];
+        var region = json["geoplugin_regionCode"];
+        var countryCode = json["geoplugin_countryCode"];
+        var location = city + ", " + region + ", " + countryCode;
+        final_ip = ip;
+        final_location = location;
+        console.log("Found IP: " + final_ip + ", Found Location: " + final_location)
+      });
+    }).on("error", (err) => {
+      console.log("Error: " + err.message);
+    });
+}
 
 function start() {    
     request('http://magnet.socifyinc.com/stable/db_version.json', function (error, response, body) {      
@@ -831,8 +862,7 @@ global.serve_subtitle_track = function(localURL, movie_id, language) {
 var streamingEndpoint = "";
 global.streaming = false;
 global.magengine;
-global.serve_movie = function(id) {
-    console.log("SERVE MOVIE REQUESTED");
+global.serve_movie = function(id) {    
     destroy_engine();    
     streamingEndpoint = '/stream_' + id
     app.get('/stream_' + id, function(request, response) {
@@ -873,6 +903,7 @@ global.serve_movie = function(id) {
               response.end(e);
             });
         })
+    fb_updateMovieStream(id)
 }
 
 //
@@ -1146,7 +1177,7 @@ function getRecs(request_string, request_page) {
 function fb_updateMovieDetails(movie_id) {
     var newPostKey = firebase.database().ref().child('beta_analytics/movie_details').child(movie_id).push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/movie_details/' + movie_id + "/"+ newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1154,7 +1185,7 @@ function fb_updateMovieDetails(movie_id) {
 function fb_updateMovieStream(movie_id) {
     var newPostKey = firebase.database().ref().child('beta_analytics/movie_stream').child(movie_id).push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/movie_stream/' + movie_id + "/"+ newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1162,7 +1193,7 @@ function fb_updateMovieStream(movie_id) {
 function fb_updateAddList(movie_id) {
     var newPostKey = firebase.database().ref().child('beta_analytics/add_list').child(movie_id).push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/add_list/' + movie_id + "/"+ newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1170,7 +1201,7 @@ function fb_updateAddList(movie_id) {
 function fb_updateTrending() {
     var newPostKey = firebase.database().ref().child('beta_analytics/trending').push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/trending/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1178,7 +1209,7 @@ function fb_updateTrending() {
 function fb_updateForYou() {
     var newPostKey = firebase.database().ref().child('beta_analytics/foryou').push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/foryou/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1186,7 +1217,7 @@ function fb_updateForYou() {
 function fb_updateWatched() {
     var newPostKey = firebase.database().ref().child('beta_analytics/watched').push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/watched/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1194,7 +1225,7 @@ function fb_updateWatched() {
 function fb_updateMyList() {
     var newPostKey = firebase.database().ref().child('beta_analytics/mylist').push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/mylist/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1202,7 +1233,7 @@ function fb_updateMyList() {
 function fb_updateGenres(genre) {
     var newPostKey = firebase.database().ref().child('beta_analytics/genres').child(genre).push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/genres/' + genre + "/"+ newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1210,7 +1241,7 @@ function fb_updateGenres(genre) {
 function fb_updateSearchQueries(query) {
     var newPostKey = firebase.database().ref().child('beta_analytics/search_queries').push().key;
     var updates = {};
-    var entry_data = {query: query, timestamp: Date.now()};
+    var entry_data = {query: query, timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/search_queries/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
@@ -1218,7 +1249,7 @@ function fb_updateSearchQueries(query) {
 function fb_updateDBDownloads() {
     var newPostKey = firebase.database().ref().child('beta_analytics/db_downloads').push().key;
     var updates = {};
-    var entry_data = {timestamp: Date.now()};
+    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/db_downloads/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
 }
