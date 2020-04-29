@@ -2,7 +2,7 @@
 window.$ = window.jQuery = require('jquery');
 
 function link_movieDetails(movie_id){
-  $("#bg_layer").fadeOut(300, function(){
+  $("#bg_layer").fadeOut(150, function(){
       location.href = 'movie?q='+movie_id;
     });
 }

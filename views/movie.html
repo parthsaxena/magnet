@@ -322,7 +322,7 @@
               </div>
             </div>        
             <div class="overlay_dewey">                                     
-                <button style="position: relative; bottom: 45px;" onclick="previousPage(); return false;" class="circle-back"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</p></button>
+                <button style="position: relative; bottom: 45px; display: none;" onclick="previousPage(); return false;" class="circle-back" id="back_page"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</p></button>
           <center>
             <div class="row" style="position: relative; bottom: 55px;">
               <div class="col-6" style="">
@@ -362,7 +362,7 @@
         </div>
       </div>
         <script>
-            //$("#player_exit").hide();
+            $("#back_page").fadeIn(1000);
             $(".plyr").hover(function() {
               $(this).fadeIn(250);
             }, function() {
