@@ -291,7 +291,7 @@
         <div class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
                 <div class="double-bounce2"></div>
-            <br><center><p style="position: relative;color: white; font-size: 22px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:43px;" id="download_speed"></p></center>
+            <br><center><p style="position: relative;color: white; font-size: 18px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:47px;" id="download_speed"></p></center>
               </div> 
         
         <div class="modal" tabindex="-1" role="dialog" id="notify_delay" style="border-radius: none!important; z-index:10;">
@@ -377,7 +377,7 @@
 
             // Might use later to fadeOut the pages from movie.html
             function fadeBody(link){
-              $("#bg_layer").fadeOut(500, function(){
+              $("#bg_layer").fadeOut(300, function(){
                 location.href = link;
               });
             }                   
@@ -406,8 +406,9 @@
                 if (isNoticeOpen) {
                     close_notice_modal();
                 }
-                
-              $("#player_exit").fadeOut(1000);
+              if (!isInPlayer){
+                $("#player_exit").fadeOut(1000);
+              }
               var overlay = document.getElementsByClassName("overlay_dewey")[0];
               overlay.classList.remove("overlay_fade");
               $("#header").fadeIn(1000);

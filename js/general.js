@@ -2,7 +2,9 @@
 window.$ = window.jQuery = require('jquery');
 
 function link_movieDetails(movie_id){
-    location.href = 'movie?q='+movie_id;
+  $("#bg_layer").fadeOut(300, function(){
+      location.href = 'movie?q='+movie_id;
+    });
 }
 
 function findGetParameter(parameterName) {
@@ -19,7 +21,7 @@ function findGetParameter(parameterName) {
 }
 
 function previousPage(){
-    $("#bg_layer").fadeOut(500, function(){
+    $("#bg_layer").fadeOut(300, function(){
       window.history.back();
     });
 }
