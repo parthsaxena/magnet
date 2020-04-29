@@ -10,6 +10,7 @@ const ProgressBar = require('electron-progressbar');
 const request = require('request');
 global.yifysubtitles = require('yifysubtitles');
 const http = require('http');
+var progress = require('request-progress');
 
 // analytics
 var firebase = require("firebase/app");
