@@ -177,7 +177,22 @@ function start() {
       if (fs.existsSync(path.join(getAppDataPath(), 'db.json'))) {
         fs.readFile(path.join(getAppDataPath(), 'db.json'), 'utf8', function (err, data) {
           if (err) throw err;
-          temp_db = JSON.parse(data);
+          var messageObject;
+          try {
+            temp_db = JSON.parse(message);
+          } catch (e) {
+            fs.unlink(path.join(getAppDataPath(), 'db.json'), (err) => {
+              if (err) {
+                console.error(err)
+                  electron.app.exit();
+                return
+              } else {
+                  console.log("Detected corrup DB; Restarting...");
+                  electron.app.relaunch();
+                  electron.app.exit();
+              }
+            })
+          }
           if (temp_db["version"] == version_string) {
             // no need to update  
             console.log("[Startup] Local DB is same version as Remote DB");

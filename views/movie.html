@@ -459,7 +459,7 @@
       </div>
         <script>                              
             const Http = new XMLHttpRequest();
-            const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings']});            
+            const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'airplay']});            
             var details_bg = "";    
             const url='http://localhost:3000/completed_movie?q=' + IMDB_ID;
             const update_url = 'http://localhost:3000/update_watching?id=' + IMDB_ID + '&timestamp=';
