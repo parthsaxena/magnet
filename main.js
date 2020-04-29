@@ -201,62 +201,60 @@ function start() {
             var keys = Object.keys(db);
             console.log("Found " + keys.length + " keys");
             if (fs.existsSync(path.join(getAppDataPath(), 'history_db.json'))) {
-          console.log("Magnet Has Already Been Run: " + getAppDataPath());
-          fs.readFile(path.join(getAppDataPath(), 'history_db.json'), 'utf8', function (err, data) {
-              if (err) throw err;
-              history_db = JSON.parse(data);
-              history_ids = Object.keys(history_db);
-  
-              // For You
-              //console.log("[ForYou] First Time");            
-              fs.readFile(path.join(getAppDataPath(), 'mylist_db.json'), 'utf8', function (list_err, list_data) {
-                  if (list_err) throw list_err;
-                  mylist_db = JSON.parse(list_data);
-  
-                  for (var list_id of Object.keys(mylist_db)) {
-                    history_ids.push(list_id)
-                  }
-                  console.log("Found history ID's: " + history_ids);
-               
-                  var recs = getRecs("", 1);
-            
-                  // Sort recommendations by similarity and remove input movies
-                  var sortedObj = {}
-                  Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
-                  var limitedObj = {}
-                  var keys = Object.keys(sortedObj);      
-                  for (movie_id of history_ids) {
-                    delete sortedObj[movie_id];
-                  }
-                  for (var i = 0; i < 96; i++) {
-                    limitedObj[keys[i]] = sortedObj[keys[i]]
-                  }
-                  recsNeedUpdate = false;
-                  recsObj = limitedObj;
-            
-                  //console.log("[Trending] First Time");
-                  var sortedObjTwo = {};
-                  var limitedObjTwo = {};
-                  Object.keys(db).map(key => ({ key: key, value: db[key] })).sort((first, second) => (first.value.rating < second.value.rating) ? -1 : (first.value.rating > second.value.rating) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObjTwo[sortedData.value.imdb_code] = sortedData.value);
-                  var keys = Object.keys(sortedObjTwo);
-                  var i = 0;
-                  var added = 0;
-                  while (added < 96) {
-                    if (db[keys[i]]["year"] > 2017) {
-                      limitedObjTwo[keys[i]] = db[keys[i]];
-                      added++;
-                    }   
-                    i++;   
-                  }
-                  trendingObj = limitedObjTwo;
-  
-                  app.listen(PORT, function() {
-                      console.log("[Backend] Launched on port " + PORT);
-                      // Server Launched, Open Window                      
-                      createWindow();
+              console.log("Magnet Has Already Been Run: " + getAppDataPath());
+              fs.readFile(path.join(getAppDataPath(), 'history_db.json'), 'utf8', function (err, data) {
+                  if (err) throw err;
+                  history_db = JSON.parse(data);
+                  history_ids = Object.keys(history_db);
+
+                  fs.readFile(path.join(getAppDataPath(), 'mylist_db.json'), 'utf8', function (list_err, list_data) {
+                      if (list_err) throw list_err;
+                      mylist_db = JSON.parse(list_data);
+
+                      for (var list_id of Object.keys(mylist_db)) {
+                        history_ids.push(list_id)
+                      }
+                      console.log("Found history ID's: " + history_ids);
+
+                      var recs = getRecs("", 1);
+
+                      // Sort recommendations by similarity and remove input movies
+                      var sortedObj = {}
+                      Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
+                      var limitedObj = {}
+                      var keys = Object.keys(sortedObj);      
+                      for (movie_id of history_ids) {
+                        delete sortedObj[movie_id];
+                      }
+                      for (var i = 0; i < 96; i++) {
+                        limitedObj[keys[i]] = sortedObj[keys[i]]
+                      }
+                      recsNeedUpdate = false;
+                      recsObj = limitedObj;
+
+                      //console.log("[Trending] First Time");
+                      var sortedObjTwo = {};
+                      var limitedObjTwo = {};
+                      Object.keys(db).map(key => ({ key: key, value: db[key] })).sort((first, second) => (first.value.rating < second.value.rating) ? -1 : (first.value.rating > second.value.rating) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObjTwo[sortedData.value.imdb_code] = sortedData.value);
+                      var keys = Object.keys(sortedObjTwo);
+                      var i = 0;
+                      var added = 0;
+                      while (added < 96) {
+                        if (db[keys[i]]["year"] > 2017) {
+                          limitedObjTwo[keys[i]] = db[keys[i]];
+                          added++;
+                        }   
+                        i++;   
+                      }
+                      trendingObj = limitedObjTwo;
+
+                      app.listen(PORT, function() {
+                          console.log("[Backend] Launched on port " + PORT);
+                          // Server Launched, Open Window                      
+                          createWindow();
+                      });
                   });
               });
-          });
             } else {
                 console.log("First Time Running");
                 var obj = {};
@@ -390,9 +388,7 @@ function retrieveData() {
                   if (err) throw err;
                   history_db = JSON.parse(data);
                   history_ids = Object.keys(history_db);
-      
-                  // For You
-                  //console.log("[ForYou] First Time");            
+               
                   fs.readFile(path.join(getAppDataPath(), 'mylist_db.json'), 'utf8', function (list_err, list_data) {
                       if (list_err) throw list_err;
                       mylist_db = JSON.parse(list_data);
@@ -532,7 +528,7 @@ function createWindow() {
       electron.shell.openExternal(url);
     });
 
-    //window.webContents.openDevTools();    
+    window.webContents.openDevTools();    
 }
 
 //
@@ -581,10 +577,11 @@ app.get('/movie', cors(), function(request, response) {
     destroy_engine();
 });
 
-app.get('/watching', cors(), function(request, response) {
-    var watched = JSON.stringify(history_db);
-
-    var values = {"json_string": watched};
+app.get('/watching', cors(), function(request, response) {    
+    var sortedObj = {}
+    Object.keys(history_db).map(key => ({ key: key, value: history_db[key] })).sort((first, second) => (first.value.watching_timestamp < second.value.watching_timestamp) ? -1 : (first.value.watching_timestamp > second.value.watching_timestamp) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);        
+    
+    var values = {"json_string": JSON.stringify(sortedObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'watched.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
@@ -692,10 +689,12 @@ app.get('/update_watching', cors(), function(request, response) {
     var movie_id = request.query.id;    
     var timestamp = request.query.timestamp;    
     var duration = request.query.duration; 
+    var watching_timestamp = request.query.watching_timestamp;
     var json = db[movie_id];
     json["timestamp"] = timestamp;
     json["duration"] = duration;
     json["progress"] = parseInt(timestamp) / parseInt(duration);    
+    json["watching_timestamp"] = parseInt(watching_timestamp);
     history_db[movie_id] = json;        
     fs.writeFile (path.join(getAppDataPath(), 'history_db.json'), JSON.stringify(history_db), function(err) {
         if (err) {
@@ -894,7 +893,6 @@ global.serve_movie = function(id) {
             var requested_id = id;
             console.log("[Engine] Requested stream of " + requested_id);
             var magnet = db[requested_id]["magnet"];
-            console.log("[Engine] Magnet link: " + magnet)
             var magengine = streamTorrent(magnet).then(function(file) {
               response.setHeader('Content-Length', file.length);
               response.setHeader('Content-Type', `video/${file.ext}`);

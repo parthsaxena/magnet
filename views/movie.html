@@ -282,7 +282,7 @@
           </div>
         </div>
         
-        <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;" onclick="exitPlayer();"><</div></button>
+        <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
         
         <div class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
@@ -301,8 +301,7 @@
         <div id="big_player" style="display: none!important; z-index: -1; opacity: 1;">
         <video poster="" id="player" style="width=0; height=0;" playsinline controls>          
 
-                <script>  
-                    var current_time = 0;
+                <script>                      
                     $("#player_exit").hide();
                     $(".plyr").hover(function() {
                       $(this).fadeIn(250);
@@ -323,15 +322,19 @@
                     }                   
                                         
                     function exitPlayer() {
-                        console.log("Player exited at: "+ current_time);
-                        var updated_percent = Math.round(100*(current_time/60)/(movie["runtime"]));
-                        $(".progress").css("width", updated_percent+"%");
-                        if (updated_percent >= 1){
-                          document.getElementById("space").innerHTML = "";
-                          $(".progress_line").show();
-                          document.getElementById("progress_text").innerHTML = updated_percent+"%";
-                          document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
-                        }
+                        console.log("Player exited at: "+ player.currentTime);
+                        clearInterval(update_interval);
+                        if (player.currentTime != 0) {
+                            updateTimestamp();
+                            var updated_percent = Math.round(100*(player.currentTime/60)/(movie["runtime"]));
+                            $(".progress").css("width", updated_percent+"%");
+                            if (updated_percent >= 1){
+                              document.getElementById("space").innerHTML = "";
+                              $(".progress_line").show();
+                              document.getElementById("progress_text").innerHTML = updated_percent+"%";
+                              document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
+                            }
+                        }                                                
 
                         isInPlayer = false;             
                         player.pause();
@@ -350,8 +353,7 @@
                         $( ".plyr" ).fadeOut("slow", function() {                            
                             $(".plyr").fadeOut(1000);
                             $("#bg_layer").fadeTo(500, 1);
-                        });         
-                        clearInterval(update_interval);
+                        });                                 
                     }
                     
                     const IMDB_ID = "{{imdb_id}}"
@@ -438,7 +440,7 @@
               </div>
             </div>        
             <div class="overlay_dewey">                                     
-            <button style="position: relative; bottom: 45px;" onclick="previousPage(); return false;" class="circle-back"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</button>
+                <button style="position: relative; bottom: 45px;" onclick="previousPage(); return false;" class="circle-back"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</p></button>
           <center>
             <div class="row" style="position: relative; bottom: 55px;">
               <div class="col-6" style="">
@@ -484,10 +486,10 @@
             const url='http://localhost:3000/completed_movie?q=' + IMDB_ID;
             const update_url = 'http://localhost:3000/update_watching?id=' + IMDB_ID + '&timestamp=';
             var update_interval; 
+            var COMPLETED = false;
                         
             player.on('timeupdate', event => {
-                var difference = player.duration - player.currentTime;
-                current_time = player.currentTime;
+                var difference = player.duration - player.currentTime;                
                 //console.log("Updated current time: " + player.currentTime + "; Duration: " + player.duration + "; Difference: " + difference);   
                 
                 if (difference < 600 && !COMPLETED && player.currentTime != 0) {
@@ -547,10 +549,7 @@
                 $("#player_exit").fadeOut(700);
                 if (!hasPlayed) { 
                     hasPlayed = true;                                        
-                    update_interval = setInterval(function() {
-                        Http.open("GET", update_url + player.currentTime + '&duration=' + player.duration);
-                        Http.send();                                                
-                    }, 15 * 1000);
+                    update_interval = setInterval(updateTimestamp, 15 * 1000);
                 }
                 console.log("We're playing");
                 close_loading_modal();
@@ -563,9 +562,14 @@
                 if (isInPlayer) {
                     $("#player_exit").fadeIn(700);
                 }
-                console.log("We're playing");
+                console.log("We're paused");
                 close_loading_modal();
             });
+            
+            function updateTimestamp() {
+                Http.open("GET", update_url + player.currentTime + '&duration=' + player.duration + '&watching_timestamp=' + Date.now());
+                Http.send();  
+            }
             
             function shorten_summary(summary){
                 if (summary.length > 500){
