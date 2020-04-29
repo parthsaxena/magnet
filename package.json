@@ -17,6 +17,7 @@
     "request": "^2.88.2",
     "request-progress": "^3.0.0",
     "torrent-stream": "^1.2.0",
+    "webtorrent": "^0.108.1",
     "yifysubtitles": "^2.1.5"
   },
   "devDependencies": {

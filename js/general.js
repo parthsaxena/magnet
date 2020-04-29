@@ -19,7 +19,9 @@ function findGetParameter(parameterName) {
 }
 
 function previousPage(){
-    window.history.back();
+    $("#bg_layer").fadeOut(500, function(){
+      window.history.back();
+    });
 }
 
 function signInUser(){

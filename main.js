@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 global.path = require('path');
 const cors = require('cors');
 const parseRange = require('range-parser');
-const torrentStream = require('torrent-stream');
 const fs = require('fs');
 const electron = require('electron');
 const ProgressBar = require('electron-progressbar');
@@ -11,6 +10,8 @@ const request = require('request');
 global.yifysubtitles = require('yifysubtitles');
 const http = require('http');
 var progress = require('request-progress');
+let WebTorrent = require('webtorrent')
+global.client = new WebTorrent();
 
 // analytics
 var firebase = require("firebase/app");
@@ -528,7 +529,7 @@ function createWindow() {
       electron.shell.openExternal(url);
     });
 
-    window.webContents.openDevTools();    
+    //window.webContents.openDevTools();    
 }
 
 //
@@ -872,58 +873,68 @@ global.serve_subtitle_track = function(localURL, movie_id, language) {
     return '/subtitles_' + movie_id + "_" + language;
 } 
 
-var streamingEndpoint = "";
+var currentMagnet = "";
+var currentEndpoint = "";
+var currentTorrent;
 global.streaming = false;
 global.magengine;
-global.serve_movie = function(id) {  
-    tmpEndpoint = '/stream_' + id
-    if (streaming && streamingEndpoint != tmpEndpoint) {
-        magengine.remove(function() {
-            console.log("[Engine] Removed Files");
-            magengine.destroy(function() {
-                console.log("[Engine] Destroyed Engine");
-                streaming = false;
-            }); 
-        });        
-    }    
-    streamingEndpoint = '/stream_' + id
-    app.get('/stream_' + id, function(request, response) {
-            const range = request.headers.range;
-            response.setHeader('Accept-Ranges', 'bytes');
-            var requested_id = id;
-            console.log("[Engine] Requested stream of " + requested_id);
-            var magnet = db[requested_id]["magnet"];
-            var magengine = streamTorrent(magnet).then(function(file) {
-              response.setHeader('Content-Length', file.length);
-              response.setHeader('Content-Type', `video/${file.ext}`);
-              if (request.headers.range === undefined) {
-                if (request.method !== 'GET') return response.end();
-                return file.createReadStream().pipe(response);
-              } else {
-                const ranges = parseRange(file.length, request.headers.range, { combine: true });
-                if (ranges === -1) {
-                    // 416 Requested Range Not Satisfiable
-                    response.statusCode = 416;
-                    return response.end();
-                } else if (ranges === -2 || ranges.type !== 'bytes' || ranges.length > 1) {
-                    // 200 OK requested range malformed or multiple ranges requested, stream entire video
-                    if (request.method !== 'GET') return response.end();
-                    return file.createReadStream().pipe(response);
-                } else {
-                    // 206 Partial Content valid range requested
-                    const range = ranges[0];
-                    response.statusCode = 206;
-                    response.setHeader('Content-Length', 1 + range.end - range.start);
-                    response.setHeader('Content-Range', `bytes ${range.start}-${range.end}/${file.length}`);
-                    if (request.method !== 'GET') return response.end();
-                    return file.createReadStream(range).pipe(response);
+global.serve_movie = function(id) {    
+    var tmpEndpoint = '/stream_' + id
+    if (tmpEndpoint != currentEndpoint) {
+        // stream new movie
+        destroy_engine();       
+        console.log("[Magengine] Requested Movie Of " + id);
+        var magnet = db[id]["magnet"];
+        currentEndpoint = tmpEndpoint;
+        currentMagnet = magnet;
+        client.add(magnet, {path: path.join(getAppDataPath(), "streams")}, function(torrent) {
+            streaming = true;
+            let selected_file = {};
+            currentTorrent = torrent;
+            for(i = 0; i < torrent.files.length; i++) {
+                var file = torrent.files[i];
+                const ext = path.extname(file.name).slice(1);
+                if (ext === 'mkv' || ext === 'mp4') {
+                    console.log('[Magengine] Valid File: ' + file.name);
+                    file.ext = ext;
+                    selected_file = file
                 }
-              }
-            }).catch(function (e) {
-              console.error(e);
-              response.end(e);
+            }            
+            app.get(currentEndpoint, function(request, response) {
+                console.log("[Magengine] Request Received On Stream " + id);
+                response.setHeader('Content-Length', selected_file.length);
+                response.setHeader('Content-Type', `video/${selected_file.ext}`);
+                let range = request.headers.range;
+                if(!range) {                    
+                    if (request.method !== 'GET') return response.end();
+                    return selected_file.createReadStream().pipe(response);                    
+                }                                
+                console.log("[Magengine] Got Range: " + range);
+                let positions = range.replace(/bytes=/, "").split("-");
+               
+                let start = parseInt(positions[0], 10);            
+                let file_size = selected_file.length;                
+                let end = positions[1] ? parseInt(positions[1], 10) : file_size - 1;                
+                let chunksize = (end - start) + 1;                
+                let head = {
+                    "Content-Range": "bytes " + start + "-" + end + "/" + file_size,
+                    "Accept-Ranges": "bytes",
+                    "Content-Length": chunksize,
+                    "Content-Type": "video/mp4"
+                }
+                response.writeHead(206, head);                
+                let stream_position = {
+                    start: start,
+                    end: end
+                }                
+                let stream = selected_file.createReadStream(stream_position)            
+                stream.pipe(response);                
+                stream.on("error", function(err) {
+                    return next(err);
+                });
             });
-        })
+        });
+    }   
     fb_updateMovieStream(id)
 }
 
@@ -931,15 +942,26 @@ global.serve_movie = function(id) {
 // Recommender Methods
 //
 
-function destroy_engine() {
+function destroy_engine() {    
     if (streaming) {
-        magengine.remove(function() {
-            console.log("[Engine] Removed Files");
-            magengine.destroy(function() {
-                console.log("[Engine] Destroyed Engine");
+        if (currentMagnet != "") {
+            // remove current torrent
+            
+            for (var i = 0; i < currentTorrent.files.length; i++) {
+                var file_path = path.join(getAppDataPath(), "streams", currentTorrent.files[i].path)
+                console.log("PATH: " + file_path)
+                fs.unlink(file_path, (err) => {
+                  if (err) {                                        
+                      console.error(err);
+                  }
+                })
+            }
+            
+            client.remove(currentTorrent, function() {
                 streaming = false;
-            }); 
-        });        
+                console.log("[Magengine] Removed Existing Torrent: " + currentMagnet);                
+            });
+        }      
     }
 }
 

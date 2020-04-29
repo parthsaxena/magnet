@@ -29,31 +29,32 @@
                   <!-- Links -->
                   <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                      <a class="nav-link" href="trending">Trending</a>
+                      <a class="nav-link" onclick="fadeBody('trending');">Trending</a>
                   </li>
                       <li class="nav-item">
-                          <a class="nav-link" href="movies" onclick="">For You
+                        <!-- href="movies" -->
+                          <a class="nav-link" onclick="fadeBody('movies');">For You
                               <span class="sr-only">(current)</span>
                           </a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link" href="watching">Watching</a>
+                        <a class="nav-link" onclick="fadeBody('watching');">Watching</a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link" href="my_list">My List</a>
+                        <a class="nav-link" onclick="fadeBody('my_list');">My List</a>
                       </li>
                       <li class="nav-item">
                         <div class="dropdown">
                           <a class="nav-link dropdown-toggle genres_item" href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Genres</a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="background: black;">
-                              <a class="dropdown-item" href="genre?q=Comedy">Comedy</a>
-                              <a class="dropdown-item" href="genre?q=Action">Action</a>
-                              <a class="dropdown-item" href="genre?q=Horror">Horror</a>                              
-                              <a class="dropdown-item" href="genre?q=Drama">Drama</a>
-                              <a class="dropdown-item" href="genre?q=Romance">Romance</a>
-                              <a class="dropdown-item" href="genre?q=Mystery">Mystery</a>
-                              <a class="dropdown-item" href="genre?q=Animation">Animation</a>                              
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Comedy');">Comedy</a>
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Action');">Action</a>
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Horror');">Horror</a>                              
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Drama');">Drama</a>
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Romance');">Romance</a>
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Mystery');">Mystery</a>
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Animation');">Animation</a>                              
                             </div>
                         </div>
                       </li>
@@ -73,7 +74,10 @@
           </nav>
           <!--/.Navbar-->
         </header>        
-        <style>                
+        <style>  
+            a {
+              cursor: pointer;
+            }              
             #recs {
                 display: none;
             }
@@ -282,11 +286,12 @@
           </div>
         </div>
         
-        <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
+        <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
         
         <div class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
                 <div class="double-bounce2"></div>
+            <br><center><p style="position: relative;color: white; font-size: 25px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:45px;" id="download_speed"></p></center>
               </div> 
         
         <div class="modal" tabindex="-1" role="dialog" id="notify_delay" style="border-radius: none!important; z-index:10;">
@@ -299,131 +304,8 @@
             </div>
           </div>
         <div id="big_player" style="display: none!important; z-index: -1; opacity: 1;">
-        <video poster="" id="player" style="width=0; height=0;" playsinline controls>          
-
-                <script>                      
-                    $("#player_exit").hide();
-                    $(".plyr").hover(function() {
-                      $(this).fadeIn(250);
-                    }, function() {
-                      $(this).fadeOut(250);
-                    });
-                    $( document ).ready(function() {
-                        //document.getElementById("big_player").innerHTML = '<video poster="" id="player" style="width=0; height=0; display: none!important;" playsinline controls></video>';
-                        $(".plyr").hide();                        
-                    });                   
-                    var bg_image = "";
-                    var isInPlayer = false; 
-
-                    // Might use later to fadeOut the pages from movie.html
-                    function fadeBody(){
-                      /*$("#bg_layer").fadeOut();
-                      location.href = "movies";*/
-                    }                   
-                                        
-                    function exitPlayer() {
-                        console.log("Player exited at: "+ player.currentTime);
-                        clearInterval(update_interval);
-                        if (player.currentTime != 0) {
-                            updateTimestamp();
-                            var updated_percent = Math.round(100*(player.currentTime/60)/(movie["runtime"]));
-                            $(".progress").css("width", updated_percent+"%");
-                            if (updated_percent >= 1){
-                              document.getElementById("space").innerHTML = "";
-                              $(".progress_line").show();
-                              document.getElementById("progress_text").innerHTML = updated_percent+"%";
-                              document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
-                            }
-                        }                                                
-
-                        isInPlayer = false;             
-                        player.pause();
-                        if (isLoadingOpen) {
-                            close_loading_modal();
-                        } 
-                        if (isNoticeOpen) {
-                            close_notice_modal();
-                        }
-                        
-                      $("#player_exit").fadeOut(1000);
-                      var overlay = document.getElementsByClassName("overlay_dewey")[0];
-                      overlay.classList.remove("overlay_fade");
-                      $("#header").fadeIn(1000);
-                        
-                        $( ".plyr" ).fadeOut("slow", function() {                            
-                            $(".plyr").fadeOut(1000);
-                            $("#bg_layer").fadeTo(500, 1);
-                        });                                 
-                    }
-                    
-                    const IMDB_ID = "{{imdb_id}}"
-                    var movieID = IMDB_ID;
-                    let {remote} = require('electron');                    
-                    //remote.getGlobal("serve_movie")(IMDB_ID);
-                    var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");         
-            
-                    const PROVIDED_TIMESTAMP = {{timestamp}};
-                    const DURATION = {{duration}};
-                    //function 
-                    function watch() {                          
-                        var f = PROVIDED_TIMESTAMP + 10;
-                        var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
-                        var B_URL = "http://localhost:3000/stream_" + IMDB_ID;    
-                        //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
-                        //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";               
-                        if (PROVIDED_TIMESTAMP != 0) {
-                            document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';   
-                        } else {
-                            document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';   
-                        } 
-                        console.log("TAPPED");
-                        remote.getGlobal("serve_movie")(IMDB_ID);
-                        isInPlayer = true;             
-                        var jumbotron = document.getElementsByClassName("jumbotron")[0];
-                        var overlay = document.getElementsByClassName("overlay_dewey")[0]; 
-                        bg_image = document.getElementById("background").style.backgroundImage;
-                       $("#header").fadeOut(1000);
-                       $("#bg_layer").fadeTo(1000, 0);         
-                        setTimeout(function() { 
-                             $(".plyr").fadeIn(1000);
-                            player.play();
-                            $("#player_exit").fadeIn(1000);
-                            document.getElementById("big_player").style.display = "block"
-                            document.querySelector("video").style.display = "block"
-                            //exitPlayer();
-                        }, 1000);                          
-                                                                    
-                        return false;
-                    }
-                    
-                    remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
-                      .then(res => {
-                        for (sub of res) {
-                            var abs_path = sub["path"];            
-                            if (abs_path != '') {
-                                if (sub["lang"] == 'english') {                                    
-                                    var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "english");
-                                    document.getElementById("player").innerHTML += `<track kind="captions" label="English" src="` + remote_path + `" srclang="en" default />`;                       
-                                    console.log("found english sub" + remote_path);
-                                    console.log("PATH:" + abs_path);
-                                } else if (sub["lang"] == 'spanish') {
-                                    var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "spanish");
-                                    document.getElementById("player").innerHTML += `<track kind="captions" label="Spanish" src="` + remote_path + `" srclang="es" default />`;                          
-                                    console.log("found spanish sub" + remote_path);
-                                    console.log("PATH:" + abs_path);
-                                } else if (sub["lang"] == 'chinese') {
-                                    var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "chinese");
-                                    document.getElementById("player").innerHTML += `<track kind="captions" label="Chinese" src="` + remote_path + `" srclang="zh" default />`;                          
-                                    console.log("found chinese sub" + remote_path);
-                                    console.log("PATH:" + abs_path); 
-                                }
-                            }
-                        }                        
-                      })
-                      .catch(error => {});                                                                      
-                </script>                                                    
-                </video>
-                </div>
+        <video poster="" id="player" style="width=0; height=0;" playsinline controls></video>
+        </div>
       <div id="general_layer">
       <div id="bg_layer">
       <div class="jumbotron jumbotron-fluid">
@@ -479,7 +361,148 @@
           </div>
         </div>
       </div>
-        <script>                              
+        <script>
+            //$("#player_exit").hide();
+            $(".plyr").hover(function() {
+              $(this).fadeIn(250);
+            }, function() {
+              $(this).fadeOut(250);
+            });
+            $( document ).ready(function() {
+                //document.getElementById("big_player").innerHTML = '<video poster="" id="player" style="width=0; height=0; display: none!important;" playsinline controls></video>';
+                $(".plyr").hide();                        
+            });                   
+            var bg_image = "";
+            var isInPlayer = false; 
+
+            // Might use later to fadeOut the pages from movie.html
+            function fadeBody(link){
+              $("#bg_layer").fadeOut(500, function(){
+                location.href = link;
+              });
+            }                   
+                                
+            function exitPlayer() {
+                console.log("Player exited at: "+ player.currentTime);
+                clearInterval(update_interval);
+                clearInterval(dlSpeedInterval)
+                if (player.currentTime != 0) {
+                    updateTimestamp();
+                    var updated_percent = Math.round(100*(player.currentTime/60)/(movie["runtime"]));
+                    $(".progress").css("width", updated_percent+"%");
+                    if (updated_percent >= 1){
+                      document.getElementById("space").innerHTML = "";
+                      $(".progress_line").show();
+                      document.getElementById("progress_text").innerHTML = updated_percent+"%";
+                      document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
+                    }
+                }                                                
+
+                isInPlayer = false;             
+                player.pause();
+                if (isLoadingOpen) {
+                    close_loading_modal();
+                } 
+                if (isNoticeOpen) {
+                    close_notice_modal();
+                }
+                
+              $("#player_exit").fadeOut(1000);
+              var overlay = document.getElementsByClassName("overlay_dewey")[0];
+              overlay.classList.remove("overlay_fade");
+              $("#header").fadeIn(1000);
+                
+                $( ".plyr" ).fadeOut("slow", function() {                            
+                    $(".plyr").fadeOut(1000);
+                    $("#bg_layer").fadeTo(500, 1);
+                });                                 
+            }
+            
+            const IMDB_ID = "{{imdb_id}}"
+            var movieID = IMDB_ID;
+            let {remote} = require('electron');                    
+            //remote.getGlobal("serve_movie")(IMDB_ID);
+            var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");        
+            var dlSpeedInterval;
+    
+            const PROVIDED_TIMESTAMP = {{timestamp}};
+            const DURATION = {{duration}};
+            var endpoint;
+            //function 
+            function watch() {                                          
+                console.log("TAPPED");
+                endpoint = remote.getGlobal("serve_movie")(IMDB_ID);
+                remote.getGlobal("client").on("torrent", function(torrent) {
+                   console.log("Movie Ready!");
+                    var f = PROVIDED_TIMESTAMP + 10;
+                    var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
+                    var B_URL = "http://localhost:3000/stream_" + IMDB_ID;    
+                    //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
+                    //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";               
+                    if (PROVIDED_TIMESTAMP != 0) {
+                        document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';   
+                    } else {
+                        document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';   
+                    } 
+                });                
+                isInPlayer = true;             
+                var jumbotron = document.getElementsByClassName("jumbotron")[0];
+                var overlay = document.getElementsByClassName("overlay_dewey")[0]; 
+                bg_image = document.getElementById("background").style.backgroundImage;
+               $("#header").fadeOut(1000);
+               $("#bg_layer").fadeTo(1000, 0);         
+                setTimeout(function() { 
+                     $(".plyr").fadeIn(1000);
+                    player.play();
+                    $("#player_exit").fadeIn(1000);
+                    document.getElementById("big_player").style.display = "block"
+                    document.querySelector("video").style.display = "block"
+                    //exitPlayer();
+                }, 1000);  
+                
+                dlSpeedInterval = setInterval(function() {
+                    var raw_speed = remote.getGlobal("client").downloadSpeed / (1e6);
+                    var speed = raw_speed.toFixed(2);
+                    if (speed < 1) {
+                        raw_speed = remote.getGlobal("client").downloadSpeed / (1e3);
+                        speed = Math.ceil(raw_speed);
+                        console.log("Download Speed [KB/s]: " + speed);
+                        document.getElementById("download_speed").innerHTML = speed + " KB/s";
+                    } else {
+                        console.log("Download Speed [MB/s]: " + speed);
+                        document.getElementById("download_speed").innerHTML = speed + " MB/s";
+                    }
+                }, 1000);
+                                                            
+                return false;
+            }
+            
+            remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
+              .then(res => {
+                for (sub of res) {
+                    var abs_path = sub["path"];            
+                    if (abs_path != '') {
+                        if (sub["lang"] == 'english') {                                    
+                            var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "english");
+                            document.getElementById("player").innerHTML += `<track kind="captions" label="English" src="` + remote_path + `" srclang="en" default />`;                       
+                            console.log("found english sub" + remote_path);
+                            console.log("PATH:" + abs_path);
+                        } else if (sub["lang"] == 'spanish') {
+                            var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "spanish");
+                            document.getElementById("player").innerHTML += `<track kind="captions" label="Spanish" src="` + remote_path + `" srclang="es" default />`;                          
+                            console.log("found spanish sub" + remote_path);
+                            console.log("PATH:" + abs_path);
+                        } else if (sub["lang"] == 'chinese') {
+                            var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "chinese");
+                            document.getElementById("player").innerHTML += `<track kind="captions" label="Chinese" src="` + remote_path + `" srclang="zh" default />`;                          
+                            console.log("found chinese sub" + remote_path);
+                            console.log("PATH:" + abs_path); 
+                        }
+                    }
+                }                        
+              })
+              .catch(error => {});            
+
             const Http = new XMLHttpRequest();
             const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'airplay']});            
             var details_bg = "";    
@@ -801,7 +824,5 @@
             cover.style.opacity = "0";
             
         </script>        
-          <script>                                      
-          </script>
     </body>
 </html>
