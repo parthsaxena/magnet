@@ -179,15 +179,16 @@ function start() {
           if (err) throw err;
           var messageObject;
           try {
-            temp_db = JSON.parse(message);
+            temp_db = JSON.parse(data);
+            console.log("Parsed DB")
           } catch (e) {
             fs.unlink(path.join(getAppDataPath(), 'db.json'), (err) => {
               if (err) {
                 console.error(err)
-                  electron.app.exit();
+                electron.app.exit();
                 return
               } else {
-                  console.log("Detected corrup DB; Restarting...");
+                  console.log("Detected corrupt DB; Restarting...");
                   electron.app.relaunch();
                   electron.app.exit();
               }
