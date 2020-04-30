@@ -217,7 +217,7 @@ function start() {
                       Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
                       var limitedObj = {}
                       var keys = Object.keys(sortedObj);      
-                      for (movie_id of history_ids) {
+                      for (movie_id of Object.keys(history_db)) {
                         delete sortedObj[movie_id];
                       }
                       for (var i = 0; i < 96; i++) {
@@ -265,7 +265,7 @@ function start() {
                   Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
                   var limitedObj = {}
                   var keys = Object.keys(sortedObj);      
-                  for (movie_id of history_ids) {
+                  for (movie_id of Object.keys(history_db)) {
                     delete sortedObj[movie_id];
                   }
                   for (var i = 0; i < 96; i++) {
@@ -426,7 +426,7 @@ function retrieveData() {
                       Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
                       var limitedObj = {}
                       var keys = Object.keys(sortedObj);      
-                      for (movie_id of history_ids) {
+                      for (movie_id of Object.keys(history_db)) {
                         delete sortedObj[movie_id];
                       }
                       for (var i = 0; i < 96; i++) {
@@ -474,7 +474,7 @@ function retrieveData() {
               Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
               var limitedObj = {}
               var keys = Object.keys(sortedObj);      
-              for (movie_id of history_ids) {
+              for (movie_id of Object.keys(history_db)) {
                 delete sortedObj[movie_id];
               }
               for (var i = 0; i < 96; i++) {
@@ -507,6 +507,7 @@ function retrieveData() {
           }
         });
 }
+
 
 //
 // Electron
@@ -808,7 +809,7 @@ app.get('/movies', cors(), function(request, response) {
       // Sort recommendations by similarity and remove input movies
       var sortedObj = {}
       Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
-      for (movie_id of history_ids) {
+      for (movie_id of Object.keys(history_db)) {
         delete sortedObj[movie_id];
       }
       var limitedObj = {}
