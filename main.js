@@ -54,7 +54,7 @@ var recsNeedUpdate = true;
 var db;
 var mylist_db;
 var history_db;
-var history_ids;
+var history_ids = [];
 var isRetrieving = false;
 electron.app.disableHardwareAcceleration()
 electron.app.on("ready", function() {
@@ -205,17 +205,10 @@ function start() {
               console.log("Magnet Has Already Been Run: " + getAppDataPath());
               fs.readFile(path.join(getAppDataPath(), 'history_db.json'), 'utf8', function (err, data) {
                   if (err) throw err;
-                  history_db = JSON.parse(data);
-                  history_ids = Object.keys(history_db);
-
+                  history_db = JSON.parse(data);                
                   fs.readFile(path.join(getAppDataPath(), 'mylist_db.json'), 'utf8', function (list_err, list_data) {
                       if (list_err) throw list_err;
-                      mylist_db = JSON.parse(list_data);
-
-                      for (var list_id of Object.keys(mylist_db)) {
-                        history_ids.push(list_id)
-                      }
-                      console.log("Found history ID's: " + history_ids);
+                      mylist_db = JSON.parse(list_data);                      
 
                       var recs = getRecs("", 1);
 
@@ -264,6 +257,39 @@ function start() {
                 mylist_db = obj;
                 fs.writeFileSync(path.join(getAppDataPath(), 'history_db.json'), JSON.stringify(obj));
                 fs.writeFileSync(path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(obj));
+                
+                // Get ForYou Page
+                  var recs = getRecs("", 1);                
+                  // Sort recommendations by similarity and remove input movies
+                  var sortedObj = {}
+                  Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
+                  var limitedObj = {}
+                  var keys = Object.keys(sortedObj);      
+                  for (movie_id of history_ids) {
+                    delete sortedObj[movie_id];
+                  }
+                  for (var i = 0; i < 96; i++) {
+                    limitedObj[keys[i]] = sortedObj[keys[i]]
+                  }
+                  recsNeedUpdate = false;
+                  recsObj = limitedObj;
+
+                  // Get Trending Page      
+                  var sortedObjTwo = {};
+                  var limitedObjTwo = {};
+                  Object.keys(db).map(key => ({ key: key, value: db[key] })).sort((first, second) => (first.value.rating < second.value.rating) ? -1 : (first.value.rating > second.value.rating) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObjTwo[sortedData.value.imdb_code] = sortedData.value);
+                  var keys = Object.keys(sortedObjTwo);
+                  var i = 0;
+                  var added = 0;
+                  while (added < 96) {
+                    if (db[keys[i]]["year"] > 2017) {
+                      limitedObjTwo[keys[i]] = db[keys[i]];
+                      added++;
+                    }   
+                    i++;   
+                  }
+                  trendingObj = limitedObjTwo;
+                
                 app.listen(PORT, function() {
                     console.log("[Backend] Launched on port " + PORT);
                     // Server Launched, Open Window
@@ -387,17 +413,11 @@ function retrieveData() {
               console.log("Magnet Has Already Been Run: " + getAppDataPath());
               fs.readFile(path.join(getAppDataPath(), 'history_db.json'), 'utf8', function (err, data) {
                   if (err) throw err;
-                  history_db = JSON.parse(data);
-                  history_ids = Object.keys(history_db);
+                  history_db = JSON.parse(data);            
                
                   fs.readFile(path.join(getAppDataPath(), 'mylist_db.json'), 'utf8', function (list_err, list_data) {
                       if (list_err) throw list_err;
-                      mylist_db = JSON.parse(list_data);
-      
-                      for (var list_id of Object.keys(mylist_db)) {
-                        history_ids.push(list_id)
-                      }
-                      console.log("Found history ID's: " + history_ids);
+                      mylist_db = JSON.parse(list_data);                            
                   
                       var recs = getRecs("", 1);
                 
@@ -446,6 +466,39 @@ function retrieveData() {
               mylist_db = obj;
               fs.writeFileSync(path.join(getAppDataPath(), 'history_db.json'), JSON.stringify(obj));
               fs.writeFileSync(path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(obj));
+              
+              // Get ForYou Page
+              var recs = getRecs("", 1);                
+              // Sort recommendations by similarity and remove input movies
+              var sortedObj = {}
+              Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
+              var limitedObj = {}
+              var keys = Object.keys(sortedObj);      
+              for (movie_id of history_ids) {
+                delete sortedObj[movie_id];
+              }
+              for (var i = 0; i < 96; i++) {
+                limitedObj[keys[i]] = sortedObj[keys[i]]
+              }
+              recsNeedUpdate = false;
+              recsObj = limitedObj;
+              
+              // Get Trending Page      
+              var sortedObjTwo = {};
+              var limitedObjTwo = {};
+              Object.keys(db).map(key => ({ key: key, value: db[key] })).sort((first, second) => (first.value.rating < second.value.rating) ? -1 : (first.value.rating > second.value.rating) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObjTwo[sortedData.value.imdb_code] = sortedData.value);
+              var keys = Object.keys(sortedObjTwo);
+              var i = 0;
+              var added = 0;
+              while (added < 96) {
+                if (db[keys[i]]["year"] > 2017) {
+                  limitedObjTwo[keys[i]] = db[keys[i]];
+                  added++;
+                }   
+                i++;   
+              }
+              trendingObj = limitedObjTwo;
+              
               app.listen(PORT, function() {
                   console.log("[Backend] Launched on port " + PORT);
                   // Server Launched, Open Window
@@ -649,10 +702,7 @@ app.get('/add_to_list', cors(), function(request, response) {
     var json = db[movie_id];
     if (Object.keys(mylist_db).includes(movie_id)) {
       // remove from list
-      delete mylist_db[movie_id];
-      var index = history_ids.indexOf(movie_id);
-      if (index !== -1) history_ids.splice(index, 1);
-      recsNeedUpdate = true;
+      delete mylist_db[movie_id];      
       fs.writeFile (path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(mylist_db), function(err) {
         if (err) {
             response.send("Error: " + err.message);
@@ -669,9 +719,7 @@ app.get('/add_to_list', cors(), function(request, response) {
         }
     });
     } else {
-      mylist_db[movie_id] = json;
-      history_ids.push(movie_id);
-      recsNeedUpdate = true;
+      mylist_db[movie_id] = json;      
       fs.writeFile (path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(mylist_db), function(err) {
           if (err) {
               response.send("Error: " + err.message);
@@ -691,6 +739,13 @@ app.get('/update_watching', cors(), function(request, response) {
     var timestamp = request.query.timestamp;    
     var duration = request.query.duration; 
     var watching_timestamp = request.query.watching_timestamp;
+    
+    if (!Object.keys(history_db).includes(movie_id)) {
+        // need to push to history ids and update recs
+        history_ids.push(movie_id);
+        recsNeedUpdate = true;
+    }
+    
     var json = db[movie_id];
     json["timestamp"] = timestamp;
     json["duration"] = duration;
@@ -1193,6 +1248,19 @@ function getRecs(request_string, request_page) {
   // As of now [initial release], request_page is unused.   
   if (request_string =="") {
       console.log("undefined dewey; passing in history_ids");
+      var sortedHistoryObj = {}
+      history_ids = [];
+        Object.keys(history_db).map(key => ({ key: key, value: history_db[key] })).sort((first, second) => (parseInt(first.value.timestamp) < parseInt(second.value.timestamp)) ? -1 : (parseInt(first.value.timestamp) > parseInt(second.value.timestamp)) ? 1 : 0 ).reverse().forEach((sortedData) => sortedHistoryObj[sortedData.value.imdb_code] = sortedData.value);
+        var i = 0;
+        var added = 0;
+        while (added < 10) {
+          if (added == Object.keys(sortedHistoryObj).length) {
+              break
+          }
+          history_ids.push(Object.keys(sortedHistoryObj)[i])
+          added++;
+          i++
+        }
       request_string = getHistoryString(history_ids, false);
       if (request_string == "") {
         console.log("undefined dewey x2");
@@ -1214,6 +1282,7 @@ function getRecs(request_string, request_page) {
     recs[movie_id] = db[movie_id];
     recs[movie_id]["similarity"] = similarity;
   }
+    recsNeedUpdate = false;
   return recs;
 }
 
