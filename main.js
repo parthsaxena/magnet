@@ -990,6 +990,8 @@ global.serve_movie = function(id) {
                 });
             });
         });
+    } else {
+        console.log("already streaming this title")
     }   
     fb_updateMovieStream(id)
 }
@@ -1015,7 +1017,9 @@ function destroy_engine() {
             
             client.remove(currentTorrent, function() {
                 streaming = false;
-                console.log("[Magengine] Removed Existing Torrent: " + currentMagnet);                
+                currentMagnet = "";
+                currentEndpoint = "";
+                console.log("[Magengine] Removed Existing Torrent");                
             });
         }      
     }
