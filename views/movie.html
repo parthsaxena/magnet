@@ -341,7 +341,7 @@
                   <div id="rating" style="display: inline;"><i class="fa fa-star" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
                   &nbsp;<div id="year" style="display: inline;"><i class="fa fa-calendar" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
                   &nbsp;<div id="runtime" style="display: inline;"><i class="fa fa-clock-o" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
-                  &nbsp;<div id="seeds" style="display: inline;"><i class="fas fa-users" style="color: #32a852; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
+                  &nbsp;<div id="seeds" style="display: inline;"><i class="fas fa-signal" style="color: #32a852; font-size: 1.0rem;"></i>&nbsp;&nbsp;</div>
                   </div>
                   <p id="movie_summary" style="max-width: 500px; position: relative; top: 10px; max-height: 95px; overflow-y: scroll; padding-right: 5px;"></p><br>
                   <div style="position: relative; bottom: 10px;">
@@ -706,11 +706,11 @@
                 }
             }
             if (currentHighSeeds > 100) {
-                document.getElementById("seeds").innerHTML = '<i class="fas fa-users" style="color: #32a852; font-size: 1.2rem;"></i>&nbsp;&nbsp;<span style="color:#32a852">' + currentHighSeeds + "</span>";   
+                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #32a852; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#32a852">' + currentHighSeeds + "</span>";   
             } else if (currentHighSeeds > 50) {
-                document.getElementById("seeds").innerHTML = '<i class="fas fa-users" style="color: #a8a432; font-size: 1.2rem;"></i>&nbsp;&nbsp;<span style="color:#a8a432">' + currentHighSeeds + "</span>";
+                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #a8a432; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#a8a432">' + currentHighSeeds + "</span>";
             } else {
-                document.getElementById("seeds").innerHTML = '<i class="fas fa-users" style="color: #d10202; font-size: 1.2rem;"></i>&nbsp;&nbsp;<span style="color:#d10202">' + currentHighSeeds + "</span>";
+                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #d10202; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#d10202">' + currentHighSeeds + "</span>";
             }
             if (movie["mpa_rating"] != ""){
                 document.getElementById("mpa_rating").innerHTML = movie["mpa_rating"];
