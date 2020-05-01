@@ -932,6 +932,8 @@ global.serve_subtitle_track = function(localURL, movie_id, language) {
 var currentMagnet = "";
 var currentEndpoint = "";
 var currentTorrent;
+var currentID = "";
+global.streaming_ids = [];
 global.streaming = false;
 global.magengine;
 global.serve_movie = function(id) {    
@@ -944,6 +946,7 @@ global.serve_movie = function(id) {
         currentEndpoint = tmpEndpoint;
         currentMagnet = magnet;
         client.add(magnet, {path: path.join(getAppDataPath(), "streams")}, function(torrent) {
+            currentID = id;
             streaming = true;
             let selected_file = {};
             currentTorrent = torrent;
@@ -1019,6 +1022,8 @@ function destroy_engine() {
                 streaming = false;
                 currentMagnet = "";
                 currentEndpoint = "";
+                if (!streaming_ids.includes(currentID)) { streaming_ids.push(currentID); }
+                currentID = "";
                 console.log("[Magengine] Removed Existing Torrent");                
             });
         }      
@@ -1223,6 +1228,11 @@ global.getAppDataPath = function() {
       }
     }
   }
+
+global.relaunch = function() {
+    electron.app.relaunch();
+    electron.app.exit();
+}
 
 function getAppDataPath() {
     switch (process.platform) {

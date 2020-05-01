@@ -286,6 +286,17 @@
           </div>
         </div>
         
+        <div class="modal_funny" id="restart_required">
+          <div class="modal_funny-content">
+            <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
+            <h3>Connection Issue</h3>
+            <div class="modal_funny-area">
+                <center><p>We detected a connection error with this movie.<br><span style="font-weight: 700;">Please restart Magnet to stream this title.</span></p></center>
+                <center><a class="btn btn-outline" onclick="restart();" id="restart_button"><i class="fa fa-power-off" style=""></i>&nbsp;&nbsp;Restart</a></center>
+            </div>
+          </div>
+        </div>
+        
         <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
         
         <div class="spinner centered loading_anim" style="display:none; z-index:10;">
@@ -380,7 +391,7 @@
               $("#bg_layer").fadeOut(300, function(){
                 location.href = link;
               });
-            }                   
+            }                          
                                 
             function exitPlayer() {
                 console.log("Player exited at: "+ player.currentTime);
@@ -429,7 +440,14 @@
             const PROVIDED_TIMESTAMP = {{timestamp}};
             const DURATION = {{duration}};
             var endpoint;
-            //function 
+            
+            // Check if user has watched this movie in current session
+            if (remote.getGlobal("streaming_ids").includes(IMDB_ID)) {
+                console.log("User Watched Current Movie");
+                document.getElementById("watch_button").onclick = "";
+                document.getElementById("watch_button").href = "#restart_required";
+            }
+            
             function watch() {                                          
                 console.log("TAPPED");
                 endpoint = remote.getGlobal("serve_movie")(IMDB_ID);
@@ -476,6 +494,10 @@
                 }, 1000);
                                                             
                 return false;
+            }
+            
+            function restart() {
+                remote.getGlobal("relaunch")();
             }
             
             remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
