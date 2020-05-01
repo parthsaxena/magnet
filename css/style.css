@@ -12,7 +12,14 @@ html, body {
   z-index: 3;
   width: 100%;
   box-shadow: 1px 5px 10px black;
+  padding: 13px;
 }
+
+.form-inline {
+  position: relative;
+  bottom: 7px;
+}
+
 .container-fluid {
   position: relative!important;
   top: 65px!important;
