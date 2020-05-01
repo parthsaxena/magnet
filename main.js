@@ -624,7 +624,7 @@ function createWindow() {
 }
 
 function openWebDev() {
-    //window.webContents.openDevTools();
+    window.webContents.openDevTools();
 }
 
 //
@@ -913,27 +913,85 @@ app.get('/genre', cors(), function(request, response) {
     destroy_engine();
 });
 
+function slugify (str) {
+    var map = {
+        '-' : ' ',
+        '-' : '_',
+        'a' : 'á|à|ã|â|À|Á|Ã|Â',
+        'e' : 'é|è|ê|É|È|Ê',
+        'i' : 'í|ì|î|Í|Ì|Î',
+        'o' : 'ó|ò|ô|õ|Ó|Ò|Ô|Õ',
+        'u' : 'ú|ù|û|ü|Ú|Ù|Û|Ü',
+        'c' : 'ç|Ç',
+        'n' : 'ñ|Ñ'
+    };
+    
+    str = str.toLowerCase();
+    
+    for (var pattern in map) {
+        str = str.replace(new RegExp(map[pattern], 'g'), pattern);
+    };
+
+    return str;
+};
+
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
+
+function extend(dest, src) {
+    var i = 0;
+    for(var key in src) {
+        dest[key] = src[key];
+        if (i == 96){
+          break;
+        }
+        i++;
+    }
+    return dest;
+}
+
 app.get('/search', cors(), function(request, response){
+    console.log("Search endpoint");
     var query = request.query.q;
     var json = {};
+    var firstObject = {};
     var i = 0;
     
     for (var movie_id in db){
       var movie = db[movie_id];
       var movie_title = movie["title"];
+      var movieFound = false;
       // mod means modified
-      var mod_title = ((movie_title.replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
-      var mod_query = ((query.replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
+      var mod_title = ((slugify(movie_title).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
+      var mod_query = ((slugify(query).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
       if (mod_title.includes(mod_query)){
-        json[movie_id] = movie;
-        i++;
-        if (i == 96) {
-          break;
+        if (mod_title == mod_query){
+          firstObject[movie_id] = movie;
+          movieFound = true;
+        } else {
+          json[movie_id] = movie;
+          i++;
+          if (movieFound && i >= 96){
+            break;
+          }
         }
       }
     }
 
-    var values = {"json_string": JSON.stringify(json)};
+    var combined_json = {};
+
+    if (isEmpty(firstObject)){
+      combined_json = json;
+    } else {
+      combined_json = extend(firstObject, json);
+    }
+
+    var values = {"json_string": JSON.stringify(combined_json)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'search.html'), 'utf8');
     html_content = mergeValues(values, html_content);
 
