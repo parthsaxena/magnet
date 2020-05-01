@@ -289,7 +289,7 @@
         <div class="modal_funny" id="restart_required">
           <div class="modal_funny-content">
             <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
-            <h3>Shit!</h3>
+            <h3>Just one thing...</h3>
             <div class="modal_funny-area">
                 <center><p>We detected a connection issue for this movie.<br><span style="font-weight: 700;">We need you to restart Magnet to stream this title!</span></p></center>
                 <center><a class="btn btn-outline" onclick="restart();" href="#" id="restart_button"><i class="fa fa-power-off" style=""></i>&nbsp;&nbsp;Restart</a></center>
@@ -498,11 +498,11 @@
                             document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>Preparing your movie...</span>";
                         } else {
                             console.log("Download Speed [KB/s]: " + speed);
-                            document.getElementById("download_speed").innerHTML = speed + " KB/s";                            
+                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " KB/s</span>";                            
                         }                        
                     } else {
                         console.log("Download Speed [MB/s]: " + speed);
-                        document.getElementById("download_speed").innerHTML = speed + " MB/s";
+                        document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " MB/s</span>";
                     }
                 }, 1000);
                                                             

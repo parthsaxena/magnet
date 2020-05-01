@@ -36,7 +36,11 @@ function previousPage(){
         } else if(check_url.indexOf('&' + field + '=') != -1) {
             window.location = "/movie?q=" + findGetParameter(field);
         } else {          
-            window.history.back();
+            if (autoplay) {
+                window.location = "/trending";
+            } else {
+                window.history.back();   
+            }            
         }        
     });
 }
