@@ -271,7 +271,7 @@
                   height: 7px;
                   border-radius: 100px;
               }
-        </style>        
+        </style>                      
     </head>
     <body id="background" class="movie_details_background" style="overflow-y: hidden;">
         <script src="js/plyr.js"></script>
@@ -289,10 +289,10 @@
         <div class="modal_funny" id="restart_required">
           <div class="modal_funny-content">
             <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
-            <h3>Connection Issue</h3>
+            <h3>Shit!</h3>
             <div class="modal_funny-area">
-                <center><p>We detected a connection error with this movie.<br><span style="font-weight: 700;">Please restart Magnet to stream this title.</span></p></center>
-                <center><a class="btn btn-outline" onclick="restart();" id="restart_button"><i class="fa fa-power-off" style=""></i>&nbsp;&nbsp;Restart</a></center>
+                <center><p>We detected a connection issue for this movie.<br><span style="font-weight: 700;">We need you to restart Magnet to stream this title!</span></p></center>
+                <center><a class="btn btn-outline" onclick="restart();" href="#" id="restart_button"><i class="fa fa-power-off" style=""></i>&nbsp;&nbsp;Restart</a></center>
             </div>
           </div>
         </div>
@@ -302,7 +302,7 @@
         <div class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
                 <div class="double-bounce2"></div>
-            <br><center><p style="position: relative;color: white; font-size: 18px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:47px;" id="download_speed"></p></center>
+            <br><center><p style="position: relative;color: white; font-size: 18px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:47px;" id="download_speed"><span style='font-weight:200'>Preparing your movie...</span></p></center>
               </div> 
         
         <div class="modal" tabindex="-1" role="dialog" id="notify_delay" style="border-radius: none!important; z-index:10;">
@@ -391,7 +391,13 @@
               $("#bg_layer").fadeOut(300, function(){
                 location.href = link;
               });
-            }                          
+            }  
+            function fadeBodyRestart(){
+                $("#header").fadeOut(1000);
+              $("#bg_layer").fadeOut(1000, function(){
+                  remote.getGlobal("relaunch")(movieID);
+              });
+            }  
                                 
             function exitPlayer() {
                 console.log("Player exited at: "+ player.currentTime);
@@ -447,11 +453,13 @@
                 document.getElementById("watch_button").onclick = "";
                 document.getElementById("watch_button").href = "#restart_required";
             }
-            
+                        
             function watch() {                                          
                 console.log("TAPPED");
                 endpoint = remote.getGlobal("serve_movie")(IMDB_ID);
+                var currentTorrent;
                 remote.getGlobal("client").on("torrent", function(torrent) {
+                    currentTorrent = torrent;
                    console.log("Movie Ready!");
                     var f = PROVIDED_TIMESTAMP + 10;
                     var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
@@ -480,13 +488,18 @@
                 }, 1000);  
                 
                 dlSpeedInterval = setInterval(function() {
-                    var raw_speed = remote.getGlobal("client").downloadSpeed / (1e6);
+                    var raw_speed = currentTorrent.downloadSpeed / (1e6);
                     var speed = raw_speed.toFixed(2);
                     if (speed < 1) {
-                        raw_speed = remote.getGlobal("client").downloadSpeed / (1e3);
+                        raw_speed = currentTorrent.downloadSpeed / (1e3);
                         speed = Math.ceil(raw_speed);
-                        console.log("Download Speed [KB/s]: " + speed);
-                        document.getElementById("download_speed").innerHTML = speed + " KB/s";
+                        if (speed == 0) {
+                            console.log("Download Speed [KB/s]: " + speed);
+                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>Preparing your movie...</span>";
+                        } else {
+                            console.log("Download Speed [KB/s]: " + speed);
+                            document.getElementById("download_speed").innerHTML = speed + " KB/s";                            
+                        }                        
                     } else {
                         console.log("Download Speed [MB/s]: " + speed);
                         document.getElementById("download_speed").innerHTML = speed + " MB/s";
@@ -497,7 +510,7 @@
             }
             
             function restart() {
-                remote.getGlobal("relaunch")();
+                fadeBodyRestart();
             }
             
             remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
@@ -533,6 +546,19 @@
             const update_url = 'http://localhost:3000/update_watching?id=' + IMDB_ID + '&timestamp=';
             var update_interval; 
             var COMPLETED = false;
+            
+            // Check for restart paramater
+            var autoplay = false;
+            var field = 'play';
+            var check_url = window.location.href;
+            if(check_url.indexOf('?' + field + '=') != -1) {
+                autoplay = true;
+                watch();
+            } else if(check_url.indexOf('&' + field + '=') != -1) {
+                autoplay = true;
+                watch();
+            }
+                
                         
             player.on('timeupdate', event => {
                 var difference = player.duration - player.currentTime;                

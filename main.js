@@ -33,6 +33,7 @@ const VERSION = "1.0.1";
 const PORT = 3000;
 var window;
 
+console.time("measure");
 
 electron.dialog.showErrorBox = function(title, content) {
     console.log("ERROR DEFAULTED!!!!");
@@ -246,6 +247,7 @@ function start() {
                           console.log("[Backend] Launched on port " + PORT);
                           // Server Launched, Open Window                      
                           createWindow();
+                          console.timeEnd("measure");
                       });
                   });
               });
@@ -553,37 +555,76 @@ function getHistoryString(ids, encoded) {
 
 function createWindow() {
     console.log("Loaded URL");
-    window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
-    electron.app.allowRendererProcessReuse = true;
-    window.loadURL('http://localhost:3000/trending');
     
-    window.on('ready-to-show', function() {
-      window.show();
-      window.focus();
-  });
-    /*window.webContents.on('new-window', (event, url, frameName, disposition, options) => {
-      event.preventDefault()
-      const win = new electron.BrowserWindow({
-        webContents: options.webContents, // use existing webContents if provided
-        show: false,
-          webPreferences: {
-              nodeIntegration: true              
-          }
-      })
-      win.once('ready-to-show', () => win.show())
-      if (!options.webContents) {
-        win.loadURL(url) // existing webContents will be navigated automatically
-      }
-      event.newGuest = win
-        win.webContents.openDevTools();
-    })*/
-    
-    window.webContents.on("new-window", function(event, url) {
-      event.preventDefault();
-      electron.shell.openExternal(url);
-    });
+    try {
+        fs.readFile(path.join(getAppDataPath(), 'exit.json'), 'utf8', function (err, data) {        
+            try {
+                var exit_json = JSON.parse(data);
+                if (Object.keys(exit_json).length > 0) {
+                    window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+                    electron.app.allowRendererProcessReuse = true;
+                    window.loadURL('http://localhost:3000/movie?q=' + exit_json["exit"] + '&play=true');
+                    window.on('ready-to-show', function() {
+                      window.show();
+                      window.focus();
+                    });       
+                    window.webContents.on("new-window", function(event, url) {
+                      event.preventDefault();
+                      electron.shell.openExternal(url);
+                    });   
+                    openWebDev()
+                    fs.unlink(path.join(getAppDataPath(), 'exit.json'), (err) => {
+                      if (err) {                                        
+                          console.error(err);
+                      }
+                    })
+                } else {
+                    window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+                    electron.app.allowRendererProcessReuse = true;
+                    window.loadURL('http://localhost:3000/trending');
+                    window.on('ready-to-show', function() {
+                      window.show();
+                      window.focus();
+                    });       
+                    window.webContents.on("new-window", function(event, url) {
+                      event.preventDefault();
+                      electron.shell.openExternal(url);
+                    }); 
+                    openWebDev()
+                }
+            } catch(err) {
+                window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+                electron.app.allowRendererProcessReuse = true;
+                window.loadURL('http://localhost:3000/trending');
+                window.on('ready-to-show', function() {
+                  window.show();
+                  window.focus();
+                });       
+                window.webContents.on("new-window", function(event, url) {
+                  event.preventDefault();
+                  electron.shell.openExternal(url);
+                }); 
+                openWebDev()
+            }
+        });   
+    } catch (err) {
+        window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+        electron.app.allowRendererProcessReuse = true;
+        window.loadURL('http://localhost:3000/trending');
+        window.on('ready-to-show', function() {
+          window.show();
+          window.focus();
+        });       
+        window.webContents.on("new-window", function(event, url) {
+          event.preventDefault();
+          electron.shell.openExternal(url);
+        });  
+        openWebDev()
+    }          
+}
 
-    //window.webContents.openDevTools();    
+function openWebDev() {
+    //window.webContents.openDevTools();
 }
 
 //
@@ -591,7 +632,7 @@ function createWindow() {
 //
 
 app.get('/movie', cors(), function(request, response) {
-    var imdb_id = request.query.q;
+    var imdb_id = request.query.q;    
     var json = db[imdb_id];
     response.set('Content-Type', 'text/html');
     console.log("[MovieDetails] ID: " + imdb_id);
@@ -931,7 +972,7 @@ global.serve_subtitle_track = function(localURL, movie_id, language) {
 
 var currentMagnet = "";
 var currentEndpoint = "";
-var currentTorrent;
+global.currentTorrent;
 var currentID = "";
 global.streaming_ids = [];
 global.streaming = false;
@@ -1229,7 +1270,9 @@ global.getAppDataPath = function() {
     }
   }
 
-global.relaunch = function() {
+global.relaunch = function(id) {
+    var obj = {exit:id}
+    fs.writeFileSync(path.join(getAppDataPath(), 'exit.json'), JSON.stringify(obj));    
     electron.app.relaunch();
     electron.app.exit();
 }

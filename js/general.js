@@ -2,9 +2,15 @@
 window.$ = window.jQuery = require('jquery');
 
 function link_movieDetails(movie_id){
-  $("#bg_layer").fadeOut(150, function(){
-      location.href = 'movie?q='+movie_id;
-    });
+    if(!autoplay) {
+        $("#bg_layer").fadeOut(150, function(){
+          location.href = 'movie?q='+movie_id;
+        });   
+    } else {
+        $("#bg_layer").fadeOut(150, function(){
+          location.href = 'movie?q='+movie_id+"&previous_id="+IMDB_ID;
+        });
+    }
 }
 
 function findGetParameter(parameterName) {
@@ -22,7 +28,16 @@ function findGetParameter(parameterName) {
 
 function previousPage(){
     $("#bg_layer").fadeOut(300, function(){
-      window.history.back();
+        // Check for restart paramater
+        var field = 'previous_id';
+        var check_url = window.location.href;        
+        if(check_url.indexOf('?' + field + '=') != -1) {
+            window.location = "/movie?q=" + findGetParameter(field);
+        } else if(check_url.indexOf('&' + field + '=') != -1) {
+            window.location = "/movie?q=" + findGetParameter(field);
+        } else {          
+            window.history.back();
+        }        
     });
 }
 
