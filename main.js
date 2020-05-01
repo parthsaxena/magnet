@@ -624,7 +624,7 @@ function createWindow() {
 }
 
 function openWebDev() {
-    window.webContents.openDevTools();
+    //window.webContents.openDevTools();
 }
 
 //
@@ -955,32 +955,48 @@ function extend(dest, src) {
     return dest;
 }
 
-app.get('/search', cors(), function(request, response){
-    console.log("Search endpoint");
+app.get('/search', cors(), function(request, response){    
     var query = request.query.q;
     var json = {};
     var firstObject = {};
     var i = 0;
     
-    for (var movie_id in db){
-      var movie = db[movie_id];
-      var movie_title = movie["title"];
-      var movieFound = false;
-      // mod means modified
-      var mod_title = ((slugify(movie_title).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
-      var mod_query = ((slugify(query).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
-      if (mod_title.includes(mod_query)){
-        if (mod_title == mod_query){
-          firstObject[movie_id] = movie;
-          movieFound = true;
-        } else {
-          json[movie_id] = movie;
-          i++;
-          if (movieFound && i >= 96){
-            break;
+    if (query.length > 1) {
+        for (var movie_id in db){
+          var movie = db[movie_id];
+          var movie_title = movie["title"];
+          var movieFound = false;
+          // mod means modified
+          var mod_title = ((slugify(movie_title).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
+          var mod_query = ((slugify(query).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
+          if (mod_title.includes(mod_query)){
+            if (mod_title == mod_query){
+              firstObject[movie_id] = movie;
+              movieFound = true;
+            } else {
+              json[movie_id] = movie;
+              i++;
+              if (movieFound && i >= 96){
+                break;
+              }
+            }
           }
         }
-      }
+    } else {
+        for (var movie_id in db){
+          var movie = db[movie_id];
+          var movie_title = movie["title"];
+          // mod means modified
+          var mod_title = ((movie_title.replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
+          var mod_query = ((query.replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
+          if (mod_title.includes(mod_query)){
+            json[movie_id] = movie;
+            i++;
+            if (i == 96) {
+              break;
+            }
+          }
+        }
     }
 
     var combined_json = {};
