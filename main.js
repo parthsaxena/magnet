@@ -624,7 +624,7 @@ function createWindow() {
 }
 
 function openWebDev() {
-    //window.webContents.openDevTools();
+    window.webContents.openDevTools();
 }
 
 //

@@ -62,12 +62,12 @@
                   <!-- Links -->
 
                   <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: red;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> VPN</span></a>  
-                  <form class="form-inline" action="search" method="GET">
+                 <div class="form-inline">
                       <div class="md-form my-0" style=" position: relative; top: 5px;">
                           <i class="fa fa-search" style="position: relative; left: 28px; color: #cebc8b;"></i>
-                          <input name="q" id="searchbar" class="form-control searchbar" type="text" placeholder="Search..." aria-label="Search" style="width: 300px; padding-left: 30px; border-bottom: 1px solid #cebc8b;">
+                          <input id="searchbar" class="form-control searchbar" type="text" placeholder="Search..." aria-label="Search" style="width: 300px; padding-left: 30px; border-bottom: 1px solid #cebc8b;">
                       </div>
-                  </form>
+                  </div>
               </div>
               <!-- Collapsible content -->
 
@@ -373,6 +373,16 @@
         </div>
       </div>
         <script>
+            // For the search
+              document.querySelector('#searchbar').addEventListener('keypress', function (e) {
+                  if (e.key === 'Enter') {
+                    //console.log(searchbar.value);
+                    var search_value = slugify(document.getElementById("searchbar").value);
+                    //console.log(search_value);
+                    location.href = "/search?q="+search_value;
+                    console.log("Enter clicked");
+                  }
+              });
             $("#back_page").fadeIn(1000);
             $(".plyr").hover(function() {
               $(this).fadeIn(250);
