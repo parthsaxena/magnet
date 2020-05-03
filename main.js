@@ -29,7 +29,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
-const VERSION = "1.0.1";
+const VERSION = "1.0.2";
 const PORT = 3000;
 var window;
 
@@ -52,6 +52,7 @@ getNetwork();
 
 var recsNeedUpdate = true;
 
+var hasWindowBeenCreatedOnce = false;
 var db;
 var mylist_db;
 var history_db;
@@ -520,14 +521,14 @@ electron.app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (electron.BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+      createWindow();
     }
 });
 electron.app.on('window-all-closed', () => {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-      electron.app.quit()
+    if (hasWindowBeenCreatedOnce) {
+        electron.app.quit();
     }
 })
 
@@ -553,7 +554,9 @@ function getHistoryString(ids, encoded) {
   }
 }
 
-function createWindow() {
+
+function createWindow() {    
+    
     console.log("Loaded URL");
     
     try {
@@ -624,7 +627,8 @@ function createWindow() {
 }
 
 function openWebDev() {
-    window.webContents.openDevTools();
+    hasWindowBeenCreatedOnce = true
+    //window.webContents.openDevTools();
 }
 
 //
