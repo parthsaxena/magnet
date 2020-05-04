@@ -7,8 +7,9 @@
     <a href="http://magnet.socifyinc.com" target="_blank">Website</a> |
     <a href="#quickstart">Quickstart</a> |
     <a href="#features">Features</a> |  
+    <a href="#license">License</a> |
     <a href="#contact">Contact</a>
-</p>
+</p>. 
 <h1>Magnet</h1>
 <p align="left">Stream any movie via bittorrent protocol with personalization, recommendations, subtitles, and more.</p>
 <div id="quickstart">
