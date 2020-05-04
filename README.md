@@ -30,6 +30,10 @@
   <img src="http://magnet.socifyinc.com/img/MovieDetails.png" width="97%" alt="Magnet" />
   </p>
 </div>
+<div id="license">
+  <h2>License</h2>
+    <p align="left">This work is dedicated to the public domain. See <code>LICENSE.md</code> for more details.</p>
+</div>
 <div id="contact">
   <h2>Contact Us</h2>
     <p align="left">Reach out to us at <code>magnet@socifyinc.com</code><br><br>Developed by <a href="http://parthsaxena.com" target="_blank">Parth Saxena</a> & <a href="https://www.instagram.com/anshulpanda/" target="_blank">Anshul Panda</p>
