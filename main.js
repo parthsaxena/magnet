@@ -13,22 +13,6 @@ var progress = require('request-progress');
 let WebTorrent = require('webtorrent')
 global.client = new WebTorrent();
 
-// analytics
-var firebase = require("firebase/app");
-require("firebase/database");
-var firebaseConfig = {
-    apiKey: "AIzaSyCXX0VC1lX7UlLs2qAjhUy7ZM3YyJrwP7M",
-    authDomain: "magnet-f7299.firebaseapp.com",
-    databaseURL: "https://magnet-f7299.firebaseio.com",
-    projectId: "magnet-f7299",
-    storageBucket: "magnet-f7299.appspot.com",
-    messagingSenderId: "263213102480",
-    appId: "1:263213102480:web:56e58ecf3d6664ea5cef15",
-    measurementId: "G-3PV14LT24B"
-};
-firebase.initializeApp(firebaseConfig);
-var database = firebase.database();
-
 const VERSION = "1.0.2";
 const PORT = 3000;
 var window;
@@ -46,11 +30,7 @@ app.use(bodyParser.json())
 
 cleanDirectories();
 
-var final_ip = "";
-var final_location = "";
-getNetwork();
-
-var recsNeedUpdate = true;
+Update = true;
 
 var hasWindowBeenCreatedOnce = false;
 var db;
@@ -148,28 +128,6 @@ function cleanDirectories() {
     } else {
         console.log("No tmp folder found");
     }
-}
-
-function getNetwork() {
-    http.get('http://www.geoplugin.net/json.gp', (resp) => {
-      let data = '';  
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });  
-      resp.on('end', () => {    
-        var json = JSON.parse(data);
-        var ip = json["geoplugin_request"];
-        var city = json["geoplugin_city"];
-        var region = json["geoplugin_regionCode"];
-        var countryCode = json["geoplugin_countryCode"];
-        var location = city + ", " + region + ", " + countryCode;
-        final_ip = ip;
-        final_location = location;
-        console.log("Found IP: " + final_ip + ", Found Location: " + final_location)
-      });
-    }).on("error", (err) => {
-      console.log("Error: " + err.message);
-    });
 }
 
 function start() {    
@@ -334,7 +292,7 @@ function start() {
               var percent = state.percent * 100;                
               if(!progressBar.isCompleted()){
                 progressBar.value = percent;             
-                  if (!isRetrieving && percent == 100) { fb_updateDBDownloads(); retrieveData(); }
+                  if (!isRetrieving && percent == 100) { retrieveData(); }
               }
               //console.log('progress', progressBar.value);
             })
@@ -344,7 +302,7 @@ function start() {
             .on('end', function () { 
               if(!progressBar.isCompleted()){
                 progressBar.value = 100;                
-                  if (!isRetrieving) { fb_updateDBDownloads();  retrieveData(); }
+                  if (!isRetrieving) { retrieveData(); }
               }              
             })
             .pipe(fs.createWriteStream(path.join(getAppDataPath(), 'db.json')));   
@@ -386,7 +344,7 @@ function start() {
           //console.log('progress', percent);
           if(!progressBar.isCompleted()){
             progressBar.value = percent;
-              if (!isRetrieving && percent == 100) { fb_updateDBDownloads(); retrieveData(); }
+              if (!isRetrieving && percent == 100) { retrieveData(); }
           }
           //console.log('progress', progressBar.value);
         })
@@ -396,7 +354,7 @@ function start() {
         .on('end', function () {     
           if(!progressBar.isCompleted()){
             progressBar.value = 100;
-              if (!isRetrieving) { fb_updateDBDownloads(); retrieveData(); }
+              if (!isRetrieving) { retrieveData(); }
           }          
         })
         .pipe(fs.createWriteStream(path.join(getAppDataPath(), 'db.json')));   
@@ -510,7 +468,6 @@ function retrieveData() {
           }
         });
 }
-
 
 //
 // Electron
@@ -669,8 +626,6 @@ app.get('/movie', cors(), function(request, response) {
         values["duration"] = history_db[imdb_id]["duration"];
     }
     html_content = mergeValues(values, html_content);
-
-    fb_updateMovieDetails(imdb_id);
     
     response.write(html_content);
     response.end();   
@@ -684,8 +639,7 @@ app.get('/watching', cors(), function(request, response) {
     var values = {"json_string": JSON.stringify(sortedObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'watched.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-
-    fb_updateWatched();
+    
     response.write(html_content);
     response.end();   
     destroy_engine();
@@ -697,8 +651,7 @@ app.get('/my_list', cors(), function(request, response) {
     var values = {"json_string": my_list};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'my_list.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-
-    fb_updateMyList();
+    
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -772,8 +725,7 @@ app.get('/add_to_list', cors(), function(request, response) {
               response.end();
           } else {
               response.status(200);
-              console.log('Updated mylist DB with movie_id: ' + movie_id);
-              fb_updateAddList(movie_id);
+              console.log('Updated mylist DB with movie_id: ' + movie_id);              
               response.end();
           }
       });
@@ -837,8 +789,7 @@ app.get('/trending', cors(), function(request, response) {
     var values = {"json_string": JSON.stringify(trendingObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'trending.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-
-    fb_updateTrending();
+    
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -873,8 +824,7 @@ app.get('/movies', cors(), function(request, response) {
     var values = {"json_string": JSON.stringify(recsObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movies.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-    
-    fb_updateForYou();
+        
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -910,8 +860,7 @@ app.get('/genre', cors(), function(request, response) {
     var values = {"json_string": genre_json};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'genres.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-
-    fb_updateGenres(query);
+    
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -1014,8 +963,7 @@ app.get('/search', cors(), function(request, response){
     var values = {"json_string": JSON.stringify(combined_json)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'search.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-
-    fb_updateSearchQueries(query);
+    
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -1114,8 +1062,7 @@ global.serve_movie = function(id) {
         });
     } else {
         console.log("already streaming this title")
-    }   
-    fb_updateMovieStream(id)
+    }       
 }
 
 //
@@ -1420,84 +1367,4 @@ function getRecs(request_string, request_page) {
   }
     recsNeedUpdate = false;
   return recs;
-}
-
-function fb_updateMovieDetails(movie_id) {
-    var newPostKey = firebase.database().ref().child('beta_analytics/movie_details').child(movie_id).push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/movie_details/' + movie_id + "/"+ newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateMovieStream(movie_id) {
-    var newPostKey = firebase.database().ref().child('beta_analytics/movie_stream').child(movie_id).push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/movie_stream/' + movie_id + "/"+ newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateAddList(movie_id) {
-    var newPostKey = firebase.database().ref().child('beta_analytics/add_list').child(movie_id).push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/add_list/' + movie_id + "/"+ newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateTrending() {
-    var newPostKey = firebase.database().ref().child('beta_analytics/trending').push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/trending/' + newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateForYou() {
-    var newPostKey = firebase.database().ref().child('beta_analytics/foryou').push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/foryou/' + newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateWatched() {
-    var newPostKey = firebase.database().ref().child('beta_analytics/watched').push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/watched/' + newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateMyList() {
-    var newPostKey = firebase.database().ref().child('beta_analytics/mylist').push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/mylist/' + newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateGenres(genre) {
-    var newPostKey = firebase.database().ref().child('beta_analytics/genres').child(genre).push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/genres/' + genre + "/"+ newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateSearchQueries(query) {
-    var newPostKey = firebase.database().ref().child('beta_analytics/search_queries').push().key;
-    var updates = {};
-    var entry_data = {query: query, timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/search_queries/' + newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
-}
-
-function fb_updateDBDownloads() {
-    var newPostKey = firebase.database().ref().child('beta_analytics/db_downloads').push().key;
-    var updates = {};
-    var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
-    updates['beta_analytics/db_downloads/' + newPostKey] = entry_data;
-    return firebase.database().ref().update(updates);
 }
