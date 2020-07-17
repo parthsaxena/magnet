@@ -1,7 +1,7 @@
 {
   "name": "Magnet",
   "productName": "Magnet",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "about-window": "^1.13.4",
     "cors": "^2.8.5",
     "electron-progressbar": "^1.2.0",
     "express": "^4.17.1",

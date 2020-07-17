@@ -58,7 +58,7 @@
                       </li>
                   </ul>
                   <!-- Links -->
-
+                  <a id="about_link" onclick="openAbout()"><i style="padding-right: 15px; color: #cebc8b" class="fas fa-info-circle fa-lg"></i></a>
                   <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: red;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> VPN</span></a>  
                   <div class="form-inline">
                       <div class="md-form my-0" style=" position: relative; top: 5px;">
@@ -87,6 +87,10 @@
         <div class="container-fluid" id="movies" style="max-width: 99.3%; position: relative; top: 5px;">
           <!--<h4 style="position: relative; top: 10px; color: white;">Comedy</h4><br>-->
                 <script>
+                let {remote} = require('electron'); 
+                function openAbout() {
+                  remote.getGlobal("showAbout")();
+                }
 
                     // For the search
                     document.querySelector('#searchbar').addEventListener('keypress', function (e) {

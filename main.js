@@ -12,6 +12,8 @@ const http = require('http');
 var progress = require('request-progress');
 let WebTorrent = require('webtorrent')
 global.client = new WebTorrent();
+const openAboutWindow = require('about-window').default;
+const Menu = electron.Menu;
 
 const VERSION = "1.0.2";
 const PORT = 3000;
@@ -24,6 +26,7 @@ electron.dialog.showErrorBox = function(title, content) {
     console.log(`${title}\n${content}`);
 };
 
+var showAbout = false;
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -76,7 +79,7 @@ electron.app.on("ready", function() {
               electron.dialog.showMessageBox(null, options).then(result => {
                  console.log("non-mandatory update;");
                   start();
-              });
+              });              
             } else {
                 // latest version
                 console.log("no update");
@@ -212,6 +215,7 @@ function start() {
               });
             } else {
                 console.log("First Time Running");
+                showAbout = true;
                 var obj = {};
                 history_db = obj;
                 history_ids = Object.keys(obj);
@@ -259,6 +263,7 @@ function start() {
             }        
           } else {
             // we need to update
+            showAbout = true;
             var progressBar = new ProgressBar({
                 indeterminate: false,
                 text: 'Hold on...',
@@ -310,6 +315,7 @@ function start() {
         });
       } else {
         // we need to update
+        showAbout = true;
         var progressBar = new ProgressBar({
             indeterminate: false,
             text: 'Hold on...',
@@ -521,7 +527,7 @@ function createWindow() {
             try {
                 var exit_json = JSON.parse(data);
                 if (Object.keys(exit_json).length > 0) {
-                    window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+                    window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
                     electron.app.allowRendererProcessReuse = true;
                     window.loadURL('http://localhost:3000/movie?q=' + exit_json["exit"] + '&play=true');
                     window.on('ready-to-show', function() {
@@ -539,7 +545,7 @@ function createWindow() {
                       }
                     })
                 } else {
-                    window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+                  window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
                     electron.app.allowRendererProcessReuse = true;
                     window.loadURL('http://localhost:3000/trending');
                     window.on('ready-to-show', function() {
@@ -553,7 +559,7 @@ function createWindow() {
                     openWebDev()
                 }
             } catch(err) {
-                window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+              window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
                 electron.app.allowRendererProcessReuse = true;
                 window.loadURL('http://localhost:3000/trending');
                 window.on('ready-to-show', function() {
@@ -568,7 +574,7 @@ function createWindow() {
             }
         });   
     } catch (err) {
-        window = new electron.BrowserWindow({title: "Magnet", width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
+      window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
         electron.app.allowRendererProcessReuse = true;
         window.loadURL('http://localhost:3000/trending');
         window.on('ready-to-show', function() {
@@ -585,7 +591,65 @@ function createWindow() {
 
 function openWebDev() {
     hasWindowBeenCreatedOnce = true
+     window.webContents.once('dom-ready', () => { global.showAbout(); });    
+    addMenu();
     //window.webContents.openDevTools();
+}
+
+//app.once
+function addMenu() {  
+  const menu = Menu.buildFromTemplate([
+    {
+        label: 'Magnet',
+        submenu: [            
+            {
+                label: 'About Magnet',
+                click: () =>
+                    openAboutWindow({
+                        icon_path: path.join(__dirname, 'icons/icon.ico'),
+                        package_json_dir: __dirname,
+                        win_options: {
+                            parent: window,
+                            modal: true,
+                        },
+                        show_close_button: 'Close',
+                        open_devtools: process.env.NODE_ENV !== 'production',
+                        adjust_window_size: false,
+                        homepage: "http://magnet.socifyinc.com",
+                        use_version_info: false,
+                        bug_report_url: 'https://github.com/parthsaxena/magnet/issues/new',
+                        bug_link_text: "found a bug?",
+                        css_path: path.join(__dirname, 'css/about.css'),
+                        copyright: "Open-source software from Parth & Anshul",
+                        open_devtools: false
+                    })
+            },
+        ],
+    },
+]);
+electron.app.applicationMenu = menu;
+console.log("Added Menu");
+}
+
+global.showAbout = function() {
+  openAboutWindow({
+    icon_path: path.join(__dirname, 'icons/icon.ico'),
+    package_json_dir: __dirname,
+    win_options: {
+        parent: window,
+        modal: true,
+    },
+    show_close_button: 'Close',
+    open_devtools: process.env.NODE_ENV !== 'production',
+    adjust_window_size: false,
+    homepage: "http://magnet.socifyinc.com",
+    use_version_info: false,
+    bug_report_url: 'https://github.com/parthsaxena/magnet/issues/new',
+    bug_link_text: "found a bug?",
+    css_path: path.join(__dirname, 'css/about.css'),
+    copyright: "Open-source software from Parth & Anshul",
+    open_devtools: false
+})
 }
 
 //
