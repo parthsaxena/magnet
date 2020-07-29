@@ -14,6 +14,7 @@ let WebTorrent = require('webtorrent')
 global.client = new WebTorrent();
 const openAboutWindow = require('about-window').default;
 const Menu = electron.Menu;
+const Fuse = require('fuse.js');
 
 const VERSION = "1.0.2";
 const LOCAL_IP = "10.0.0.186";
@@ -590,10 +591,18 @@ function createWindow() {
     }
 }
 
+var js = [];
+var fuse;
 function openWebDev() {
     hasWindowBeenCreatedOnce = true
      //window.webContents.once('dom-ready', () => { global.showAbout(); });
     addMenu();
+    var js = [];
+    for (var movie_id in db) {
+      js.push(db[movie_id]);
+    }
+    const options = {keys:['title', { name: 'cast.name', weight: 1}], threshold: 0.4};
+    fuse = new Fuse(js, options);
     //window.webContents.openDevTools();
 }
 
@@ -985,52 +994,19 @@ app.get('/search', cors(), function(request, response){
     var firstObject = {};
     var i = 0;
 
-    if (query.length > 1) {
-        for (var movie_id in db){
-          var movie = db[movie_id];
-          var movie_title = movie["title"];
-          var movieFound = false;
-          // mod means modified
-          var mod_title = ((slugify(movie_title).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
-          var mod_query = ((slugify(query).replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
-          if (mod_title.includes(mod_query)){
-            if (mod_title == mod_query){
-              firstObject[movie_id] = movie;
-              movieFound = true;
-            } else {
-              json[movie_id] = movie;
-              i++;
-              if (movieFound && i >= 96){
-                break;
-              }
-            }
-          }
-        }
-    } else {
-        for (var movie_id in db){
-          var movie = db[movie_id];
-          var movie_title = movie["title"];
-          // mod means modified
-          var mod_title = ((movie_title.replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
-          var mod_query = ((query.replace(/[^0-9a-z]/gi, '')).replace(/\s/g, "")).toLowerCase();
-          if (mod_title.includes(mod_query)){
-            json[movie_id] = movie;
-            i++;
-            if (i == 96) {
-              break;
-            }
-          }
-        }
+    var combined_json = {};
+    const result = fuse.search(query)
+    for (var i = 0; i < result.length; i++) {
+      var imdb = result[i]["item"]["imdb_code"];
+      combined_json[imdb] = db[imdb];
+      if (i==95) break;
     }
 
-    var combined_json = {};
-
-    if (isEmpty(firstObject)){
+    /*if (isEmpty(firstObject)){
       combined_json = json;
     } else {
       combined_json = extend(firstObject, json);
-    }
-
+    }*/
     var values = {"json_string": JSON.stringify(combined_json)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'search.html'), 'utf8');
     html_content = mergeValues(values, html_content);
@@ -1154,15 +1130,18 @@ function destroy_engine() {
                   }
                 })
             }
-
-            client.remove(currentTorrent, function() {
-                streaming = false;
-                currentMagnet = "";
-                currentEndpoint = "";
-                if (!streaming_ids.includes(currentID)) { streaming_ids.push(currentID); }
-                currentID = "";
-                console.log("[Magengine] Removed Existing Torrent");
-            });
+            try {
+              client.remove(currentTorrent, function() {
+                  streaming = false;
+                  currentMagnet = "";
+                  currentEndpoint = "";
+                  if (!streaming_ids.includes(currentID)) { streaming_ids.push(currentID); }
+                  currentID = "";
+                  console.log("[Magengine] Removed Existing Torrent");
+              });
+            } catch(err) {
+              console.log("[Magengine] Failed to Destroy Engine: " , err.message);
+            }
         }
     }
 }
