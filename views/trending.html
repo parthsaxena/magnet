@@ -6,10 +6,10 @@
       <link rel="stylesheet" href="css/style.css">
       <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>      
-      <script src="js/general.js"></script>  
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+      <script src="js/general.js"></script>
         <script src="https://kit.fontawesome.com/71f8337c07.js" crossorigin="anonymous"></script>
-        <script>function link_movieDetails(movie_id){ location.href = 'movie?q='+movie_id;}function findGetParameter(parameterName) { var result = null, tmp = []; location.search .substr(1) .split("&") .forEach(function (item) { tmp = item.split("="); if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]); }); return result;}function signInUser(){ var email = document.getElementById("login_email").value; var password = document.getElementById("login_password").value; firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) { var errorCode = error.code; var errorMessage = error.message; document.getElementById("login_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage) });}function createUser_RDB(user_id, email){ firebase.database().ref("users/"+user_id).set({ user_id: user_id, email: email, });}function signUpUser(){ var email = document.getElementById("signup_email").value; var password = document.getElementById("signup_password").value; firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){ firebase.auth().signInWithEmailAndPassword(email, password).then(function(error){ console.log("Error code: "+ error.code); console.log("Error message: "+error.message); }); firebase.auth().onAuthStateChanged(function(user) { if (user) { createUser_RDB(user.uid, user.email); console.log("User created in realtime db."); } else { console.log("User is not signed in."); } }); }).catch(function(error){ var errorCode = error.code; var errorMessage = error.message; document.getElementById("signup_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage); });}</script>               
+        <script>function link_movieDetails(movie_id){ location.href = 'movie?q='+movie_id;}function findGetParameter(parameterName) { var result = null, tmp = []; location.search .substr(1) .split("&") .forEach(function (item) { tmp = item.split("="); if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]); }); return result;}function signInUser(){ var email = document.getElementById("login_email").value; var password = document.getElementById("login_password").value; firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) { var errorCode = error.code; var errorMessage = error.message; document.getElementById("login_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage) });}function createUser_RDB(user_id, email){ firebase.database().ref("users/"+user_id).set({ user_id: user_id, email: email, });}function signUpUser(){ var email = document.getElementById("signup_email").value; var password = document.getElementById("signup_password").value; firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){ firebase.auth().signInWithEmailAndPassword(email, password).then(function(error){ console.log("Error code: "+ error.code); console.log("Error message: "+error.message); }); firebase.auth().onAuthStateChanged(function(user) { if (user) { createUser_RDB(user.uid, user.email); console.log("User created in realtime db."); } else { console.log("User is not signed in."); } }); }).catch(function(error){ var errorCode = error.code; var errorMessage = error.message; document.getElementById("signup_error").innerHTML = errorMessage; console.log(errorCode); console.log(errorMessage); });}</script>
         <header id="header">
           <nav class="navbar navbar-expand-lg navbar-dark" style="background: black;">
               <!-- Navbar brand -->
@@ -47,18 +47,18 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="background: black;">
                               <a class="dropdown-item" href="genre?q=Comedy">Comedy</a>
                               <a class="dropdown-item" href="genre?q=Action">Action</a>
-                              <a class="dropdown-item" href="genre?q=Horror">Horror</a>                              
+                              <a class="dropdown-item" href="genre?q=Horror">Horror</a>
                               <a class="dropdown-item" href="genre?q=Drama">Drama</a>
                               <a class="dropdown-item" href="genre?q=Romance">Romance</a>
                               <a class="dropdown-item" href="genre?q=Mystery">Mystery</a>
-                              <a class="dropdown-item" href="genre?q=Animation">Animation</a>                              
+                              <a class="dropdown-item" href="genre?q=Animation">Animation</a>
                             </div>
                         </div>
                       </li>
                   </ul>
                   <!-- Links -->
-                  <a id="about_link" onclick="openAbout()"><i style="padding-right: 15px; color: #cebc8b" class="fas fa-info-circle fa-lg"></i></a>
-                  <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: red;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> VPN</span></a>  
+                  <a id="about_link" href="#modal_dewey"><i style="padding-right: 15px; color: #cebc8b" class="fas fa-info-circle fa-lg"></i></a>
+                  <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: red;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> VPN</span></a>
 
                   <div class="form-inline">
                       <div class="md-form my-0" style=" position: relative; top: 5px;">
@@ -74,7 +74,7 @@
         </header>
     </head>
     <body class="background">
-        
+
         <div class="modal_funny" id="modal_funny">
           <div class="modal_funny-content">
             <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
@@ -84,27 +84,47 @@
             </div>
           </div>
         </div>
+        <div class="modal_dewey" id="modal_dewey">
+          <div class="modal_dewey-content">
+            <!--<a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>-->
+            <br><div style="text-align: center; position: relative;">
+              <center><img id="app-icon" alt="App icon" height="170" src="img/logo.png" style="position: relative; top: 7px;"></center>
+            </div><br>
+            <center>
+            <h2 class="title" style="position: relative; bottom: 10px; font-size: 38px; letter-spacing:1px;">Magnet 1.0.3</h2>
+            <p class="description" style="color: grey;">Open-source software from Parth & Anshul</p>
+            <div class="copyright"></div>
+            <table class="versions"></table>
+            <div class="buttons" style="padding-top:5px;">
+              <a href="#" style="text-decoration: none!important;"><button id="about_close" href="#">Close</button></a>
+            </div>
+          </center><br>
+            <div style="text-align: right; padding: 10px; padding-top: 0px;">
+              <a id="feedback" target="_blank" href="https://github.com/parthsaxena/magnet/issues/new" class="link bug-report-link" style="color: navy; position: relative; right: 10px; font-size: 14px; bottom: 7px;">have feedback?</a>
+            </div>
+          </div>
+        </div>
 
-        
+
         <div class="container-fluid" id="movies" style="max-width: 99.3%;">
           <!--<h4 style="position: relative; top: 10px; color: white;">Comedy</h4><br>-->
-            <script>      
-            
-            let {remote} = require('electron'); 
+            <script>
+
+            let {remote} = require('electron');
             function openAbout() {
-              remote.getGlobal("showAbout")();
+              //remote.getGlobal("showAbout")();
             }
-                function openVPNAdvisory(){                    
+                function openVPNAdvisory(){
                     $(function() {
                           $("#notify").fadeIn();
                     });
-                }  
+                }
                 function closeVPNAdvisory(){
                     $(function() {
                           $("#notify").fadeOut();
                     });
                 }
-                
+
                 function truncate(str, no_words) {
                     return str.split(" ").splice(0,no_words).join(" ");
                 }
@@ -112,7 +132,7 @@
                 // For the search
                     document.querySelector('#searchbar').addEventListener('keypress', function (e) {
                         if (e.key === 'Enter') {
-                          
+
                           //console.log(searchbar.value);
                           var search_value = slugify(document.getElementById("searchbar").value);
                           //console.log(search_value);
@@ -120,7 +140,7 @@
                           console.log("Enter clicked");
                         }
                     });
-                
+
                 /*$(function() {
                     $(".card-img-top").on('load',function(){
                       console.log("Loaded");
@@ -169,6 +189,33 @@
                     }
             </script>
             <style>
+            #feedback {
+              text-decoration: none!important;
+            }
+            #feedback:hover {
+              font-weight: 600;
+            }
+            #about_close {
+              font-family: 'Catamaran'!important;
+              outline: none!important;
+              height: 35px!important;
+              width: 125px!important;
+              color:#cebc8b;
+              background-color: #ffffff;
+              border-color:#cebc8b;
+              border: 2px solid;
+              border-radius: 63px;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              /*padding: 15px 30px;*/
+              font-size: 11px;
+              font-weight: 600;
+            }
+            #about_close:hover {
+              color: white;
+              background-color: #cebc8b!important;
+              border-color: #cebc8b;
+            }
               .card {
                 border-radius: 0px!important;
                 border: none;

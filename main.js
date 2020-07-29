@@ -16,6 +16,7 @@ const openAboutWindow = require('about-window').default;
 const Menu = electron.Menu;
 
 const VERSION = "1.0.2";
+const LOCAL_IP = "10.0.0.186";
 const PORT = 3000;
 var window;
 
@@ -58,7 +59,7 @@ electron.app.on("ready", function() {
                     defaultId: 2,
                     title: 'Mandatory Update',
                     message: 'There is a mandatory update to Magnet.',
-                    detail: 'Go to http://magnet.socifyinc.com to download the latest version!'                
+                    detail: 'Go to http://magnet.socifyinc.com to download the latest version!'
                   };
 
               electron.dialog.showMessageBox(null, options).then(result => {
@@ -73,13 +74,13 @@ electron.app.on("ready", function() {
                     defaultId: 2,
                     title: 'Optional Update',
                     message: 'There is a new (optional) update to Magnet!',
-                    detail: 'Go to http://magnet.socifyinc.com to download the latest version!'                
+                    detail: 'Go to http://magnet.socifyinc.com to download the latest version!'
                   };
 
               electron.dialog.showMessageBox(null, options).then(result => {
                  console.log("non-mandatory update;");
                   start();
-              });              
+              });
             } else {
                 // latest version
                 console.log("no update");
@@ -94,49 +95,49 @@ function cleanDirectories() {
         fs.mkdirSync(getAppDataPath());
         fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
     } else {
-     fs.rmdir(path.join(getAppDataPath(), "streams"), { 
-      recursive: true, 
-        }, (error) => { 
-          if (error) { 
-            console.log(error); 
-          } else { 
-            console.log("Wiped Streams"); 
+     fs.rmdir(path.join(getAppDataPath(), "streams"), {
+      recursive: true,
+        }, (error) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Wiped Streams");
           }
-        });    
+        });
     if (!fs.existsSync(path.join(getAppDataPath(), 'subtitles'))) {
         fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
     } else {
-        fs.rmdir(path.join(getAppDataPath(), "subtitles"), { 
-          recursive: true, 
-            }, (error) => { 
-              if (error) { 
-                console.log(error); 
-              } else { 
-                console.log("Wiped Subtitles"); 
+        fs.rmdir(path.join(getAppDataPath(), "subtitles"), {
+          recursive: true,
+            }, (error) => {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log("Wiped Subtitles");
                 fs.mkdirSync(path.join(getAppDataPath(), "subtitles"));
               }
             });
     }
     }
-    if (fs.existsSync("/tmp/torrent-stream")) {    
-    fs.rmdir("/tmp/torrent-stream", { 
-      recursive: true, 
-        }, (error) => { 
-          if (error) { 
-            console.log(error); 
-          } else { 
-            console.log("Wiped tmp"); 
+    if (fs.existsSync("/tmp/torrent-stream")) {
+    fs.rmdir("/tmp/torrent-stream", {
+      recursive: true,
+        }, (error) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Wiped tmp");
           }
-        }); 
+        });
     } else {
         console.log("No tmp folder found");
     }
 }
 
-function start() {    
-    request('http://magnet.socifyinc.com/stable/db_version.json', function (error, response, body) {      
+function start() {
+    request('http://magnet.socifyinc.com/stable/db_version.json', function (error, response, body) {
       var version_json = JSON.parse(body);
-      var version_string = version_json["version"];        
+      var version_string = version_json["version"];
       console.log("Latest DB Version: " + version_string);
       if (fs.existsSync(path.join(getAppDataPath(), 'db.json'))) {
         fs.readFile(path.join(getAppDataPath(), 'db.json'), 'utf8', function (err, data) {
@@ -159,19 +160,19 @@ function start() {
             })
           }
           if (temp_db["version"] == version_string) {
-            // no need to update  
+            // no need to update
             console.log("[Startup] Local DB is same version as Remote DB");
-            db = temp_db["db"];  
+            db = temp_db["db"];
             var keys = Object.keys(db);
             console.log("Found " + keys.length + " keys");
             if (fs.existsSync(path.join(getAppDataPath(), 'history_db.json'))) {
               console.log("Magnet Has Already Been Run: " + getAppDataPath());
               fs.readFile(path.join(getAppDataPath(), 'history_db.json'), 'utf8', function (err, data) {
                   if (err) throw err;
-                  history_db = JSON.parse(data);                
+                  history_db = JSON.parse(data);
                   fs.readFile(path.join(getAppDataPath(), 'mylist_db.json'), 'utf8', function (list_err, list_data) {
                       if (list_err) throw list_err;
-                      mylist_db = JSON.parse(list_data);                      
+                      mylist_db = JSON.parse(list_data);
 
                       var recs = getRecs("", 1);
 
@@ -179,7 +180,7 @@ function start() {
                       var sortedObj = {}
                       Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
                       var limitedObj = {}
-                      var keys = Object.keys(sortedObj);      
+                      var keys = Object.keys(sortedObj);
                       for (movie_id of Object.keys(history_db)) {
                         delete sortedObj[movie_id];
                       }
@@ -200,14 +201,14 @@ function start() {
                         if (db[keys[i]]["year"] > 2017) {
                           limitedObjTwo[keys[i]] = db[keys[i]];
                           added++;
-                        }   
-                        i++;   
+                        }
+                        i++;
                       }
                       trendingObj = limitedObjTwo;
 
                       app.listen(PORT, function() {
                           console.log("[Backend] Launched on port " + PORT);
-                          // Server Launched, Open Window                      
+                          // Server Launched, Open Window
                           createWindow();
                           console.timeEnd("measure");
                       });
@@ -222,14 +223,14 @@ function start() {
                 mylist_db = obj;
                 fs.writeFileSync(path.join(getAppDataPath(), 'history_db.json'), JSON.stringify(obj));
                 fs.writeFileSync(path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(obj));
-                
+
                 // Get ForYou Page
-                  var recs = getRecs("", 1);                
+                  var recs = getRecs("", 1);
                   // Sort recommendations by similarity and remove input movies
                   var sortedObj = {}
                   Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
                   var limitedObj = {}
-                  var keys = Object.keys(sortedObj);      
+                  var keys = Object.keys(sortedObj);
                   for (movie_id of Object.keys(history_db)) {
                     delete sortedObj[movie_id];
                   }
@@ -239,7 +240,7 @@ function start() {
                   recsNeedUpdate = false;
                   recsObj = limitedObj;
 
-                  // Get Trending Page      
+                  // Get Trending Page
                   var sortedObjTwo = {};
                   var limitedObjTwo = {};
                   Object.keys(db).map(key => ({ key: key, value: db[key] })).sort((first, second) => (first.value.rating < second.value.rating) ? -1 : (first.value.rating > second.value.rating) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObjTwo[sortedData.value.imdb_code] = sortedData.value);
@@ -250,17 +251,17 @@ function start() {
                     if (db[keys[i]]["year"] > 2017) {
                       limitedObjTwo[keys[i]] = db[keys[i]];
                       added++;
-                    }   
-                    i++;   
+                    }
+                    i++;
                   }
                   trendingObj = limitedObjTwo;
-                
+
                 app.listen(PORT, function() {
                     console.log("[Backend] Launched on port " + PORT);
                     // Server Launched, Open Window
                     createWindow();
                 });
-            }        
+            }
           } else {
             // we need to update
             showAbout = true;
@@ -268,7 +269,7 @@ function start() {
                 indeterminate: false,
                 text: 'Hold on...',
                 detail: "We're getting the latest movies for you...",
-                    browserWindow: {              
+                    browserWindow: {
                     webPreferences: {
                         nodeIntegration: true
                     }
@@ -278,39 +279,39 @@ function start() {
                     'background-color':  '#cebc8b'
                   }
                 }
-              });  
+              });
 
                 progressBar.on('completed', function() {
-                        console.info(`completed...`);			
+                        console.info(`completed...`);
                     })
                     .on('aborted', function(value) {
                         console.info(`aborted... ${value}`);
                     })
                     .on('progress', function(value) {
-                  console.log(value, progressBar.getOptions().maxValue)			
+                  console.log(value, progressBar.getOptions().maxValue)
                 });
-              
+
             console.log("[Startup] Local DB is outdated. New Version: " + version_string);
             progress(request("http://magnet.socifyinc.com/stable/db.json"), {
 
-            }).on('progress', function (state) {    
-              var percent = state.percent * 100;                
+            }).on('progress', function (state) {
+              var percent = state.percent * 100;
               if(!progressBar.isCompleted()){
-                progressBar.value = percent;             
+                progressBar.value = percent;
                   if (!isRetrieving && percent == 100) { retrieveData(); }
               }
               //console.log('progress', progressBar.value);
             })
             .on('error', function (err) {
-                // Do something with err 
+                // Do something with err
             })
-            .on('end', function () { 
+            .on('end', function () {
               if(!progressBar.isCompleted()){
-                progressBar.value = 100;                
+                progressBar.value = 100;
                   if (!isRetrieving) { retrieveData(); }
-              }              
+              }
             })
-            .pipe(fs.createWriteStream(path.join(getAppDataPath(), 'db.json')));   
+            .pipe(fs.createWriteStream(path.join(getAppDataPath(), 'db.json')));
           }
         });
       } else {
@@ -320,7 +321,7 @@ function start() {
             indeterminate: false,
             text: 'Hold on...',
             detail: "We're getting the latest movies for you...",
-                browserWindow: {              
+                browserWindow: {
                 webPreferences: {
                     nodeIntegration: true
                 }
@@ -330,23 +331,23 @@ function start() {
                 'background-color':  '#cebc8b'
               }
             }
-          });  
+          });
 
             progressBar.on('completed', function() {
-                    console.info(`completed...`);			
+                    console.info(`completed...`);
                 })
                 .on('aborted', function(value) {
                     console.info(`aborted... ${value}`);
                 })
                 .on('progress', function(value) {
-              console.log(value, progressBar.getOptions().maxValue)			
+              console.log(value, progressBar.getOptions().maxValue)
             });
-          
+
         console.log("[Startup] No Local DB");
         progress(request("http://magnet.socifyinc.com/stable/db.json"), {
 
-        }).on('progress', function (state) {    
-          var percent = state.percent * 100;  
+        }).on('progress', function (state) {
+          var percent = state.percent * 100;
           //console.log('progress', percent);
           if(!progressBar.isCompleted()){
             progressBar.value = percent;
@@ -355,17 +356,17 @@ function start() {
           //console.log('progress', progressBar.value);
         })
         .on('error', function (err) {
-            // Do something with err 
+            // Do something with err
         })
-        .on('end', function () {     
+        .on('end', function () {
           if(!progressBar.isCompleted()){
             progressBar.value = 100;
               if (!isRetrieving) { retrieveData(); }
-          }          
+          }
         })
-        .pipe(fs.createWriteStream(path.join(getAppDataPath(), 'db.json')));   
+        .pipe(fs.createWriteStream(path.join(getAppDataPath(), 'db.json')));
       }
-    }); 
+    });
 }
 
 function retrieveData() {
@@ -380,19 +381,19 @@ function retrieveData() {
               console.log("Magnet Has Already Been Run: " + getAppDataPath());
               fs.readFile(path.join(getAppDataPath(), 'history_db.json'), 'utf8', function (err, data) {
                   if (err) throw err;
-                  history_db = JSON.parse(data);            
-               
+                  history_db = JSON.parse(data);
+
                   fs.readFile(path.join(getAppDataPath(), 'mylist_db.json'), 'utf8', function (list_err, list_data) {
                       if (list_err) throw list_err;
-                      mylist_db = JSON.parse(list_data);                            
-                  
+                      mylist_db = JSON.parse(list_data);
+
                       var recs = getRecs("", 1);
-                
+
                       // Sort recommendations by similarity and remove input movies
                       var sortedObj = {}
                       Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
                       var limitedObj = {}
-                      var keys = Object.keys(sortedObj);      
+                      var keys = Object.keys(sortedObj);
                       for (movie_id of Object.keys(history_db)) {
                         delete sortedObj[movie_id];
                       }
@@ -401,7 +402,7 @@ function retrieveData() {
                       }
                       recsNeedUpdate = false;
                       recsObj = limitedObj;
-                
+
                       //console.log("[Trending] First Time");
                       var sortedObjTwo = {};
                       var limitedObjTwo = {};
@@ -413,11 +414,11 @@ function retrieveData() {
                         if (db[keys[i]]["year"] > 2017) {
                           limitedObjTwo[keys[i]] = db[keys[i]];
                           added++;
-                        }   
-                        i++;   
+                        }
+                        i++;
                       }
                       trendingObj = limitedObjTwo;
-      
+
                       app.listen(PORT, function() {
                           console.log("[Backend] Launched on port " + PORT);
                           // Server Launched, Open Window
@@ -433,14 +434,14 @@ function retrieveData() {
               mylist_db = obj;
               fs.writeFileSync(path.join(getAppDataPath(), 'history_db.json'), JSON.stringify(obj));
               fs.writeFileSync(path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(obj));
-              
+
               // Get ForYou Page
-              var recs = getRecs("", 1);                
+              var recs = getRecs("", 1);
               // Sort recommendations by similarity and remove input movies
               var sortedObj = {}
               Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
               var limitedObj = {}
-              var keys = Object.keys(sortedObj);      
+              var keys = Object.keys(sortedObj);
               for (movie_id of Object.keys(history_db)) {
                 delete sortedObj[movie_id];
               }
@@ -449,8 +450,8 @@ function retrieveData() {
               }
               recsNeedUpdate = false;
               recsObj = limitedObj;
-              
-              // Get Trending Page      
+
+              // Get Trending Page
               var sortedObjTwo = {};
               var limitedObjTwo = {};
               Object.keys(db).map(key => ({ key: key, value: db[key] })).sort((first, second) => (first.value.rating < second.value.rating) ? -1 : (first.value.rating > second.value.rating) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObjTwo[sortedData.value.imdb_code] = sortedData.value);
@@ -461,11 +462,11 @@ function retrieveData() {
                 if (db[keys[i]]["year"] > 2017) {
                   limitedObjTwo[keys[i]] = db[keys[i]];
                   added++;
-                }   
-                i++;   
+                }
+                i++;
               }
               trendingObj = limitedObjTwo;
-              
+
               app.listen(PORT, function() {
                   console.log("[Backend] Launched on port " + PORT);
                   // Server Launched, Open Window
@@ -518,12 +519,12 @@ function getHistoryString(ids, encoded) {
 }
 
 
-function createWindow() {    
-    
+function createWindow() {
+
     console.log("Loaded URL");
-    
+
     try {
-        fs.readFile(path.join(getAppDataPath(), 'exit.json'), 'utf8', function (err, data) {        
+        fs.readFile(path.join(getAppDataPath(), 'exit.json'), 'utf8', function (err, data) {
             try {
                 var exit_json = JSON.parse(data);
                 if (Object.keys(exit_json).length > 0) {
@@ -533,14 +534,14 @@ function createWindow() {
                     window.on('ready-to-show', function() {
                       window.show();
                       window.focus();
-                    });       
+                    });
                     window.webContents.on("new-window", function(event, url) {
                       event.preventDefault();
                       electron.shell.openExternal(url);
-                    });   
+                    });
                     openWebDev()
                     fs.unlink(path.join(getAppDataPath(), 'exit.json'), (err) => {
-                      if (err) {                                        
+                      if (err) {
                           console.error(err);
                       }
                     })
@@ -551,11 +552,11 @@ function createWindow() {
                     window.on('ready-to-show', function() {
                       window.show();
                       window.focus();
-                    });       
+                    });
                     window.webContents.on("new-window", function(event, url) {
                       event.preventDefault();
                       electron.shell.openExternal(url);
-                    }); 
+                    });
                     openWebDev()
                 }
             } catch(err) {
@@ -565,14 +566,14 @@ function createWindow() {
                 window.on('ready-to-show', function() {
                   window.show();
                   window.focus();
-                });       
+                });
                 window.webContents.on("new-window", function(event, url) {
                   event.preventDefault();
                   electron.shell.openExternal(url);
-                }); 
+                });
                 openWebDev()
             }
-        });   
+        });
     } catch (err) {
       window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
         electron.app.allowRendererProcessReuse = true;
@@ -580,28 +581,28 @@ function createWindow() {
         window.on('ready-to-show', function() {
           window.show();
           window.focus();
-        });       
+        });
         window.webContents.on("new-window", function(event, url) {
           event.preventDefault();
           electron.shell.openExternal(url);
-        });  
+        });
         openWebDev()
-    }          
+    }
 }
 
 function openWebDev() {
     hasWindowBeenCreatedOnce = true
-     window.webContents.once('dom-ready', () => { global.showAbout(); });    
+     //window.webContents.once('dom-ready', () => { global.showAbout(); });
     addMenu();
     //window.webContents.openDevTools();
 }
 
 //app.once
-function addMenu() {  
+function addMenu() {
   const menu = Menu.buildFromTemplate([
     {
         label: 'Magnet',
-        submenu: [            
+        submenu: [
             {
                 label: 'About Magnet',
                 click: () =>
@@ -657,30 +658,29 @@ global.showAbout = function() {
 //
 
 app.get('/movie', cors(), function(request, response) {
-    var imdb_id = request.query.q;    
+    var imdb_id = request.query.q;
     var json = db[imdb_id];
     response.set('Content-Type', 'text/html');
     console.log("[MovieDetails] ID: " + imdb_id);
-   
+
     if (Object.keys(mylist_db).includes(imdb_id)) {
       json["on_list"] = "true";
     } else {
       json["on_list"] = "false";
-    }        
-    
+    }
+
     var recs = getRecs(imdb_id, 1);
 
-      // Sort recommendations by similarity and remove input movies      
+      // Sort recommendations by similarity and remove input movies
       var sortedObj = {}
       Object.keys(recs).map(key => ({ key: key, value: recs[key] })).sort((first, second) => (first.value.similarity < second.value.similarity) ? -1 : (first.value.similarity > second.value.similarity) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
-      delete sortedObj[imdb_id];      
+      delete sortedObj[imdb_id];
       var limitedObj = {}
       var keys = Object.keys(sortedObj);
       for (var i = 0; i < 8; i++) {
         limitedObj[keys[i]] = sortedObj[keys[i]]
-      }      
-      recs = limitedObj;        
-    
+      }
+      recs = limitedObj;
     var values = {"json_string": JSON.stringify(json), "watch_id": imdb_id, "add_id": imdb_id, "recs": JSON.stringify(recs), "imdb_id": imdb_id, "timestamp": 0, "duration": 1};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movie.html'), 'utf8');
     if (Object.keys(history_db).includes(imdb_id)) {
@@ -689,23 +689,30 @@ app.get('/movie', cors(), function(request, response) {
         values["timestamp"] = history_db[imdb_id]["timestamp"];
         values["duration"] = history_db[imdb_id]["duration"];
     }
+    console.log("[Airplay]: http://" + LOCAL_IP + ":" + PORT + "/stream.html?stream=http://" + LOCAL_IP+":" + PORT + "/stream_" + imdb_id + "#t=" + values["timestamp"]+","+(values["timestamp"]+10));
     html_content = mergeValues(values, html_content);
-    
+
     response.write(html_content);
-    response.end();   
+    response.end();
     destroy_engine();
 });
 
-app.get('/watching', cors(), function(request, response) {    
+app.get('/stream.html', cors(), function(request, response) {
+  var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'stream.html'));
+  response.write(html_content);
+  response.end();
+})
+
+app.get('/watching', cors(), function(request, response) {
     var sortedObj = {}
-    Object.keys(history_db).map(key => ({ key: key, value: history_db[key] })).sort((first, second) => (first.value.watching_timestamp < second.value.watching_timestamp) ? -1 : (first.value.watching_timestamp > second.value.watching_timestamp) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);        
-    
+    Object.keys(history_db).map(key => ({ key: key, value: history_db[key] })).sort((first, second) => (first.value.watching_timestamp < second.value.watching_timestamp) ? -1 : (first.value.watching_timestamp > second.value.watching_timestamp) ? 1 : 0 ).reverse().forEach((sortedData) => sortedObj[sortedData.value.imdb_code] = sortedData.value);
+
     var values = {"json_string": JSON.stringify(sortedObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'watched.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-    
+
     response.write(html_content);
-    response.end();   
+    response.end();
     destroy_engine();
 });
 
@@ -715,30 +722,30 @@ app.get('/my_list', cors(), function(request, response) {
     var values = {"json_string": my_list};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'my_list.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-    
+
     response.write(html_content);
     response.end();
     destroy_engine();
 });
 
 app.get('/js/plyr.js', cors(), function(request, response) {
-    response.sendFile(path.join(electron.app.getAppPath(), 'js/plyr.js'));    
+    response.sendFile(path.join(electron.app.getAppPath(), 'js/plyr.js'));
 });
 
 app.get('/js/general.js', cors(), function(request, response) {
-    response.sendFile(path.join(electron.app.getAppPath(), 'js/general.js'));   
+    response.sendFile(path.join(electron.app.getAppPath(), 'js/general.js'));
 });
 
 app.get('/css/plyr.css', cors(), function(request, response) {
-    response.sendFile(path.join(electron.app.getAppPath(), 'css/plyr.css'));   
+    response.sendFile(path.join(electron.app.getAppPath(), 'css/plyr.css'));
 });
 
 app.get('/img/logo.png', cors(), function(request, response) {
-    response.sendFile(path.join(electron.app.getAppPath(), 'img/logo.png'));    
+    response.sendFile(path.join(electron.app.getAppPath(), 'img/logo.png'));
 });
 
 app.get('/css/style.css', cors(), function(request, response) {
-    response.sendFile(path.join(electron.app.getAppPath(), 'css/style.css'));    
+    response.sendFile(path.join(electron.app.getAppPath(), 'css/style.css'));
 });
 
 app.get('/completed_movie', cors(), function(request, response) {
@@ -757,7 +764,7 @@ app.get('/completed_movie', cors(), function(request, response) {
             response.send("Operation Successful");
             response.end();
         }
-    });    
+    });
 });
 
 app.get('/add_to_list', cors(), function(request, response) {
@@ -765,7 +772,7 @@ app.get('/add_to_list', cors(), function(request, response) {
     var json = db[movie_id];
     if (Object.keys(mylist_db).includes(movie_id)) {
       // remove from list
-      delete mylist_db[movie_id];      
+      delete mylist_db[movie_id];
       fs.writeFile (path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(mylist_db), function(err) {
         if (err) {
             response.send("Error: " + err.message);
@@ -782,14 +789,14 @@ app.get('/add_to_list', cors(), function(request, response) {
         }
     });
     } else {
-      mylist_db[movie_id] = json;      
+      mylist_db[movie_id] = json;
       fs.writeFile (path.join(getAppDataPath(), 'mylist_db.json'), JSON.stringify(mylist_db), function(err) {
           if (err) {
               response.send("Error: " + err.message);
               response.end();
           } else {
               response.status(200);
-              console.log('Updated mylist DB with movie_id: ' + movie_id);              
+              console.log('Updated mylist DB with movie_id: ' + movie_id);
               response.end();
           }
       });
@@ -797,23 +804,23 @@ app.get('/add_to_list', cors(), function(request, response) {
 });
 
 app.get('/update_watching', cors(), function(request, response) {
-    var movie_id = request.query.id;    
-    var timestamp = request.query.timestamp;    
-    var duration = request.query.duration; 
+    var movie_id = request.query.id;
+    var timestamp = request.query.timestamp;
+    var duration = request.query.duration;
     var watching_timestamp = request.query.watching_timestamp;
-    
+
     if (!Object.keys(history_db).includes(movie_id)) {
         // need to push to history ids and update recs
         history_ids.push(movie_id);
         recsNeedUpdate = true;
     }
-    
+
     var json = db[movie_id];
     json["timestamp"] = timestamp;
     json["duration"] = duration;
-    json["progress"] = parseInt(timestamp) / parseInt(duration);    
+    json["progress"] = parseInt(timestamp) / parseInt(duration);
     json["watching_timestamp"] = parseInt(watching_timestamp);
-    history_db[movie_id] = json;        
+    history_db[movie_id] = json;
     fs.writeFile (path.join(getAppDataPath(), 'history_db.json'), JSON.stringify(history_db), function(err) {
         if (err) {
             response.send("Error: " + err.message);
@@ -825,7 +832,7 @@ app.get('/update_watching', cors(), function(request, response) {
             response.end();
         }
     });
-    
+
 });
 
 var trendingObj = {};
@@ -842,8 +849,8 @@ app.get('/trending', cors(), function(request, response) {
         if (db[keys[i]]["year"] > 2017) {
           limitedObj[keys[i]] = db[keys[i]];
           added++;
-        }   
-        i++;   
+        }
+        i++;
       }
       trendingObj = limitedObj;
   } else {
@@ -853,7 +860,7 @@ app.get('/trending', cors(), function(request, response) {
     var values = {"json_string": JSON.stringify(trendingObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'trending.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-    
+
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -863,7 +870,7 @@ var recsObj = {};
 app.get('/movies', cors(), function(request, response) {
   if (recsNeedUpdate) {
       console.log("[ForYou] First Time");
-      
+
       var recs = getRecs("", 1);
 
       // Sort recommendations by similarity and remove input movies
@@ -876,19 +883,19 @@ app.get('/movies', cors(), function(request, response) {
       var keys = Object.keys(sortedObj);
       for (var i = 0; i < 96; i++) {
         limitedObj[keys[i]] = sortedObj[keys[i]]
-      }      
+      }
       recsObj = limitedObj;
       recsNeedUpdate = false;
     } else {
       console.log("[ForYou] Already Got It");
     }
-    
+
     response.set('Content-Type', 'text/html');
 
     var values = {"json_string": JSON.stringify(recsObj)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'movies.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-        
+
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -896,7 +903,7 @@ app.get('/movies', cors(), function(request, response) {
 
 app.get('/genre', cors(), function(request, response) {
     var query = request.query.q;
-    
+
     var searchObj = {};
     for (var movie_id in db) {
       var movie = db[movie_id];
@@ -916,15 +923,15 @@ app.get('/genre', cors(), function(request, response) {
       if (sortedObj[keys[i]]["year"] > 2015) {
         limitedObj[keys[i]] = sortedObj[keys[i]];
         added++;
-      }   
-      i++;   
+      }
+      i++;
     }
 
     var genre_json = JSON.stringify(limitedObj);
     var values = {"json_string": genre_json};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'genres.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-    
+
     response.write(html_content);
     response.end();
     destroy_engine();
@@ -942,9 +949,9 @@ function slugify (str) {
         'c' : 'ç|Ç',
         'n' : 'ñ|Ñ'
     };
-    
+
     str = str.toLowerCase();
-    
+
     for (var pattern in map) {
         str = str.replace(new RegExp(map[pattern], 'g'), pattern);
     };
@@ -972,12 +979,12 @@ function extend(dest, src) {
     return dest;
 }
 
-app.get('/search', cors(), function(request, response){    
+app.get('/search', cors(), function(request, response){
     var query = request.query.q;
     var json = {};
     var firstObject = {};
     var i = 0;
-    
+
     if (query.length > 1) {
         for (var movie_id in db){
           var movie = db[movie_id];
@@ -1027,28 +1034,28 @@ app.get('/search', cors(), function(request, response){
     var values = {"json_string": JSON.stringify(combined_json)};
     var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'search.html'), 'utf8');
     html_content = mergeValues(values, html_content);
-    
+
     response.write(html_content);
     response.end();
     destroy_engine();
 });
 
 function get_subtitles(movie_id) {
-    var subtitlePath = path.join(getAppDataPath(), "subtitles");       
+    var subtitlePath = path.join(getAppDataPath(), "subtitles");
     yifysubtitles(movie_id, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
       .then(res => {
         for (sub of res) {
-            var abs_path = sub["path"];            
+            var abs_path = sub["path"];
             if (abs_path != '') {
                 if (sub["lang"] == 'english') {
-                    serve_subtitle_track(abs_path, movie_id, "english");                   
+                    serve_subtitle_track(abs_path, movie_id, "english");
                 } else if (sub["lang"] == 'spanish') {
-                    serve_subtitle_track(abs_path, movie_id, "spanish");                    
+                    serve_subtitle_track(abs_path, movie_id, "spanish");
                 } else if (sub["lang"] == 'chinese') {
-                    serve_subtitle_track(abs_path, movie_id, "chinese");                    
+                    serve_subtitle_track(abs_path, movie_id, "chinese");
                 }
             }
-        }                        
+        }
       })
       .catch(error => {console.log("ERROR: " + error)});
 }
@@ -1056,9 +1063,9 @@ function get_subtitles(movie_id) {
 global.serve_subtitle_track = function(localURL, movie_id, language) {
     app.get('/subtitles_' + movie_id + "_" + language, function(request, response) {
         response.sendFile(localURL);
-    });    
+    });
     return '/subtitles_' + movie_id + "_" + language;
-} 
+}
 
 var currentMagnet = "";
 var currentEndpoint = "";
@@ -1067,11 +1074,11 @@ var currentID = "";
 global.streaming_ids = [];
 global.streaming = false;
 global.magengine;
-global.serve_movie = function(id) {    
+global.serve_movie = function(id) {
     var tmpEndpoint = '/stream_' + id
     if (tmpEndpoint != currentEndpoint) {
         // stream new movie
-        destroy_engine();       
+        destroy_engine();
         console.log("[Magengine] Requested Movie Of " + id);
         var magnet = db[id]["magnet"];
         currentEndpoint = tmpEndpoint;
@@ -1089,36 +1096,36 @@ global.serve_movie = function(id) {
                     file.ext = ext;
                     selected_file = file
                 }
-            }            
+            }
             app.get(currentEndpoint, function(request, response) {
                 console.log("[Magengine] Request Received On Stream " + id);
                 response.setHeader('Content-Length', selected_file.length);
                 response.setHeader('Content-Type', `video/${selected_file.ext}`);
                 let range = request.headers.range;
-                if(!range) {                    
+                if(!range) {
                     if (request.method !== 'GET') return response.end();
-                    return selected_file.createReadStream().pipe(response);                    
-                }                                
+                    return selected_file.createReadStream().pipe(response);
+                }
                 console.log("[Magengine] Got Range: " + range);
                 let positions = range.replace(/bytes=/, "").split("-");
-               
-                let start = parseInt(positions[0], 10);            
-                let file_size = selected_file.length;                
-                let end = positions[1] ? parseInt(positions[1], 10) : file_size - 1;                
-                let chunksize = (end - start) + 1;                
+
+                let start = parseInt(positions[0], 10);
+                let file_size = selected_file.length;
+                let end = positions[1] ? parseInt(positions[1], 10) : file_size - 1;
+                let chunksize = (end - start) + 1;
                 let head = {
                     "Content-Range": "bytes " + start + "-" + end + "/" + file_size,
                     "Accept-Ranges": "bytes",
                     "Content-Length": chunksize,
                     "Content-Type": "video/mp4"
                 }
-                response.writeHead(206, head);                
+                response.writeHead(206, head);
                 let stream_position = {
                     start: start,
                     end: end
-                }                
-                let stream = selected_file.createReadStream(stream_position)            
-                stream.pipe(response);                
+                }
+                let stream = selected_file.createReadStream(stream_position)
+                stream.pipe(response);
                 stream.on("error", function(err) {
                     return next(err);
                 });
@@ -1126,37 +1133,37 @@ global.serve_movie = function(id) {
         });
     } else {
         console.log("already streaming this title")
-    }       
+    }
 }
 
 //
 // Recommender Methods
 //
 
-function destroy_engine() {    
+function destroy_engine() {
     if (streaming) {
         if (currentMagnet != "") {
             // remove current torrent
-            
+
             for (var i = 0; i < currentTorrent.files.length; i++) {
                 var file_path = path.join(getAppDataPath(), "streams", currentTorrent.files[i].path)
                 console.log("PATH: " + file_path)
                 fs.unlink(file_path, (err) => {
-                  if (err) {                                        
+                  if (err) {
                       console.error(err);
                   }
                 })
             }
-            
+
             client.remove(currentTorrent, function() {
                 streaming = false;
                 currentMagnet = "";
                 currentEndpoint = "";
                 if (!streaming_ids.includes(currentID)) { streaming_ids.push(currentID); }
                 currentID = "";
-                console.log("[Magengine] Removed Existing Torrent");                
+                console.log("[Magengine] Removed Existing Torrent");
             });
-        }      
+        }
     }
 }
 
@@ -1204,7 +1211,7 @@ function calcVector(obj){
   return obj;
 }
 
-function getUserProfile(movieList){    
+function getUserProfile(movieList){
   var featureList = [];
   var userVector = {};
   for (index in movieList){
@@ -1271,7 +1278,7 @@ function getMovieData(featureList){
     // IMDb Rating
     var rating = movie["rating"];
     var ratingFeature = "high_rating";
-    
+
     for (feature_index in featureList){
       var feature = featureList[feature_index];
       if (genreList.includes(feature)){
@@ -1315,7 +1322,7 @@ function dotProduct(userVector, movieObject, featureList){
 
 const streamTorrent = function(torrent) {
     return new Promise(function (resolve, reject) {
-        console.log("[Magengine] Opening Stream ...");        
+        console.log("[Magengine] Opening Stream ...");
         magengine = torrentStream(torrent, {tmp: getAppDataPath(), path: path.join(getAppDataPath(), "streams")});
         magengine.on('ready', function() {
             streaming = true;
@@ -1361,7 +1368,7 @@ global.getAppDataPath = function() {
 
 global.relaunch = function(id) {
     var obj = {exit:id}
-    fs.writeFileSync(path.join(getAppDataPath(), 'exit.json'), JSON.stringify(obj));    
+    fs.writeFileSync(path.join(getAppDataPath(), 'exit.json'), JSON.stringify(obj));
     electron.app.relaunch();
     electron.app.exit();
 }
@@ -1391,8 +1398,8 @@ function getQualityRating(rating){
   else return 0.4;
 }
 
-function getRecs(request_string, request_page) {  
-  // As of now [initial release], request_page is unused.   
+function getRecs(request_string, request_page) {
+  // As of now [initial release], request_page is unused.
   if (request_string =="") {
       console.log("undefined dewey; passing in history_ids");
       var sortedHistoryObj = {}

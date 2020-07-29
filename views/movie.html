@@ -8,8 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
         <script src="https://kit.fontawesome.com/71f8337c07.js" crossorigin="anonymous"></script>
-      <script src="js/general.js"></script>   
-        <link rel="stylesheet" href="https://cdn.plyr.io/3.5.10/plyr.css" />         
+      <script src="js/general.js"></script>
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.5.10/plyr.css" />
         <header>
           <nav class="navbar navbar-expand-lg navbar-dark" style="background: black;" id="header">
               <!-- Navbar brand -->
@@ -21,7 +21,7 @@
                   <span class="navbar-toggler-icon"></span>
               </button>
 
-              <!-- Collapsible content 
+              <!-- Collapsible content
               Note: might want to fade body out
               -->
               <div class="collapse navbar-collapse" id="basicExampleNav">
@@ -50,18 +50,18 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="background: black;">
                               <a class="dropdown-item" onclick="fadeBody('genre?q=Comedy');">Comedy</a>
                               <a class="dropdown-item" onclick="fadeBody('genre?q=Action');">Action</a>
-                              <a class="dropdown-item" onclick="fadeBody('genre?q=Horror');">Horror</a>                              
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Horror');">Horror</a>
                               <a class="dropdown-item" onclick="fadeBody('genre?q=Drama');">Drama</a>
                               <a class="dropdown-item" onclick="fadeBody('genre?q=Romance');">Romance</a>
                               <a class="dropdown-item" onclick="fadeBody('genre?q=Mystery');">Mystery</a>
-                              <a class="dropdown-item" onclick="fadeBody('genre?q=Animation');">Animation</a>                              
+                              <a class="dropdown-item" onclick="fadeBody('genre?q=Animation');">Animation</a>
                             </div>
                         </div>
                       </li>
                   </ul>
                   <!-- Links -->
-                  <a id="about_link" onclick="openAbout()"><i style="padding-right: 15px; color: #cebc8b" class="fas fa-info-circle fa-lg"></i></a>
-                  <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: red;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> VPN</span></a>  
+                  <a id="about_link" href="#modal_dewey"><i style="padding-right: 15px; color: #cebc8b" class="fas fa-info-circle fa-lg"></i></a>
+                  <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: red;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> VPN</span></a>
                  <div class="form-inline">
                       <div class="md-form my-0" style=" position: relative; top: 5px;">
                           <i class="fa fa-search" style="position: relative; left: 28px; color: #cebc8b;"></i>
@@ -73,11 +73,38 @@
 
           </nav>
           <!--/.Navbar-->
-        </header>        
-        <style>  
+        </header>
+        <style>
+        #feedback {
+          text-decoration: none!important;
+        }
+        #feedback:hover {
+          font-weight: 600;
+        }
+        #about_close {
+          font-family: 'Catamaran'!important;
+          outline: none!important;
+          height: 35px!important;
+          width: 125px!important;
+          color:#cebc8b;
+          background-color: #ffffff;
+          border-color:#cebc8b;
+          border: 2px solid;
+          border-radius: 63px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          /*padding: 15px 30px;*/
+          font-size: 11px;
+          font-weight: 600;
+        }
+        #about_close:hover {
+          color: white;
+          background-color: #cebc8b!important;
+          border-color: #cebc8b;
+        }
             a {
               cursor: pointer;
-            }              
+            }
             #recs {
                 display: none;
             }
@@ -94,21 +121,21 @@
                 -ms-transition: opacity .7s linear;
                 transition: opacity .7s linear;
             }
-            
+
             .overlay_fade_in {
                 opacity: 1!important;
                 /*-webkit-transition: opacity .7s linear;
                 -ms-transition: opacity .7s linear;
                 transition: opacity .7s linear;*/
             }
-            
+
           .jumbotron_animate {
             background: rgba(0, 0, 0, 0.6)!important;
             -webkit-transition: background .7s linear;
             -ms-transition: background .7s linear;
             transition: background .7s linear;
           }
-            
+
         .jumbotron_animate_black {
             background: rgba(0, 0, 0, 1)!important;;
             -webkit-transition: background .7s linear;
@@ -118,13 +145,13 @@
 
           #background {
             height: 100vh;
-            width: 100vw;            
+            width: 100vw;
             transition: opacity .7s ease-in;
-          }          
+          }
 
           .bg-loading {
             opacity: 0.6;
-          }   
+          }
             .plyr {
                 width: 100%;
                 height:100%;
@@ -135,11 +162,11 @@
                 height:100%;
             }
             .spinner {
-                z-index: 10 !important; 
+                z-index: 10 !important;
             width: 100px;
             height: 100px;
 
-            position: relative;  
+            position: relative;
             }
 
             .double-bounce1, .double-bounce2 {
@@ -151,7 +178,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            
+
             -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
             animation: sk-bounce 2.0s infinite ease-in-out;
             }
@@ -167,10 +194,10 @@
             }
 
             @keyframes sk-bounce {
-            0%, 100% { 
+            0%, 100% {
                 transform: scale(0.0);
                 -webkit-transform: scale(0.0);
-            } 50% { 
+            } 50% {
                 transform: scale(1.0);
                 -webkit-transform: scale(1.0);
             }
@@ -189,7 +216,7 @@
             }
 
             .plyr__control--overlaid {
-            background: rgba(206, 188, 139, .5);      
+            background: rgba(206, 188, 139, .5);
             }
 
             .plyr--video .plyr__control.plyr__tab-focus,
@@ -199,14 +226,14 @@
             }
 
             .plyr__control.plyr__tab-focus {
-            box-shadow: 0 0 0 5px rgba(206, 188, 139, .5);            
+            box-shadow: 0 0 0 5px rgba(206, 188, 139, .5);
             }
 
             .plyr__menu__container .plyr__control[role=menuitemradio][aria-checked=true]::before {
             background: #cebc8b;
             }
             .plyr__captions .plyr__caption {
-              font-size: 22px !important;            
+              font-size: 2em !important;
             }
             .overlay_dewey {
                 background-color: transparent;
@@ -243,13 +270,13 @@
             @keyframes your-animation-name {
                 from { background-color: #5EB4FE;}
                 to {background-color: #fff;}
-            }    
+            }
             .jumbotron {
-                background-size: cover!important;            
+                background-size: cover!important;
                 background: black;
                 height: 100%!important;
                 width: 100%!important;
-              }              
+              }
               .back_button {
                 background: none!important;
                 border: none;
@@ -274,11 +301,11 @@
                   height: 7px;
                   border-radius: 100px;
               }
-        </style>                      
+        </style>
     </head>
     <body id="background" class="movie_details_background" style="overflow-y: hidden;">
         <script src="js/plyr.js"></script>
-        
+
         <div class="modal_funny" id="modal_funny">
           <div class="modal_funny-content">
             <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
@@ -288,7 +315,27 @@
             </div>
           </div>
         </div>
-        
+        <div class="modal_dewey" id="modal_dewey">
+          <div class="modal_dewey-content">
+            <!--<a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>-->
+            <br><div style="text-align: center; position: relative;">
+              <center><img id="app-icon" alt="App icon" height="170" src="img/logo.png" style="position: relative; top: 7px;"></center>
+            </div><br>
+            <center>
+            <h2 class="title" style="position: relative; bottom: 10px; font-size: 38px; letter-spacing:1px;">Magnet 1.0.3</h2>
+            <p class="description" style="color: grey;">Open-source software from Parth & Anshul</p>
+            <div class="copyright"></div>
+            <table class="versions"></table>
+            <div class="buttons" style="padding-top:5px;">
+              <a href="#" style="text-decoration: none!important;"><button id="about_close" href="#">Close</button></a>
+            </div>
+          </center><br>
+            <div style="text-align: right; padding: 10px; padding-top: 0px;">
+              <a id="feedback" target="_blank" href="https://github.com/parthsaxena/magnet/issues/new" class="link bug-report-link" style="color: navy; position: relative; right: 10px; font-size: 14px; bottom: 7px;">have feedback?</a>
+            </div>
+          </div>
+        </div>
+
         <div class="modal_funny" id="restart_required">
           <div class="modal_funny-content">
             <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
@@ -299,15 +346,15 @@
             </div>
           </div>
         </div>
-        
+
         <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
-        
+
         <div class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
                 <div class="double-bounce2"></div>
             <br><center><p style="position: relative;color: white; font-size: 18px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:47px;" id="download_speed"><span style='font-weight:200'>Preparing your movie...</span></p></center>
-              </div> 
-        
+              </div>
+
         <div class="modal" tabindex="-1" role="dialog" id="notify_delay" style="border-radius: none!important; z-index:10;">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -334,8 +381,8 @@
                   </div>
                 </div>
               </div>
-            </div>        
-            <div class="overlay_dewey">                                     
+            </div>
+            <div class="overlay_dewey">
                 <button style="position: relative; bottom: 45px; display: none;" onclick="previousPage(); return false;" class="circle-back" id="back_page"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</p></button>
           <center>
             <div class="row" style="position: relative; bottom: 55px;">
@@ -376,7 +423,7 @@
         </div>
       </div>
         <script>
-            // For the search            
+            // For the search
               document.querySelector('#searchbar').addEventListener('keypress', function (e) {
                   if (e.key === 'Enter') {
                     //console.log(searchbar.value);
@@ -394,24 +441,24 @@
             });
             $( document ).ready(function() {
                 //document.getElementById("big_player").innerHTML = '<video poster="" id="player" style="width=0; height=0; display: none!important;" playsinline controls></video>';
-                $(".plyr").hide();                        
-            });                   
+                $(".plyr").hide();
+            });
             var bg_image = "";
-            var isInPlayer = false; 
+            var isInPlayer = false;
 
             // Might use later to fadeOut the pages from movie.html
             function fadeBody(link){
               $("#bg_layer").fadeOut(300, function(){
                 location.href = link;
               });
-            }  
+            }
             function fadeBodyRestart(){
                 $("#header").fadeOut(1000);
               $("#bg_layer").fadeOut(1000, function(){
                   remote.getGlobal("relaunch")(movieID);
               });
-            }  
-                                
+            }
+
             function exitPlayer() {
                 console.log("Player exited at: "+ player.currentTime);
                 clearInterval(update_interval);
@@ -426,13 +473,13 @@
                       document.getElementById("progress_text").innerHTML = updated_percent+"%";
                       document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
                     }
-                }                                                
+                }
 
-                isInPlayer = false;             
+                isInPlayer = false;
                 player.pause();
                 if (isLoadingOpen) {
                     close_loading_modal();
-                } 
+                }
                 if (isNoticeOpen) {
                     close_notice_modal();
                 }
@@ -442,27 +489,23 @@
               var overlay = document.getElementsByClassName("overlay_dewey")[0];
               overlay.classList.remove("overlay_fade");
               $("#header").fadeIn(1000);
-                
-                $( ".plyr" ).fadeOut("slow", function() {                            
+
+                $( ".plyr" ).fadeOut("slow", function() {
                     $(".plyr").fadeOut(1000);
                     $("#bg_layer").fadeTo(500, 1);
-                });                                 
+                });
             }
-            
+
             const IMDB_ID = "{{imdb_id}}"
             var movieID = IMDB_ID;
-            let {remote} = require('electron');                    
+            let {remote} = require('electron');
             //remote.getGlobal("serve_movie")(IMDB_ID);
-            var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");        
+            var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");
             var dlSpeedInterval;
-    
+
             const PROVIDED_TIMESTAMP = {{timestamp}};
             const DURATION = {{duration}};
             var endpoint;
-                        
-            function openAbout() {
-              remote.getGlobal("showAbout")();
-            }
 
             // Check if user has watched this movie in current session
             if (remote.getGlobal("streaming_ids").includes(IMDB_ID)) {
@@ -470,8 +513,8 @@
                 document.getElementById("watch_button").onclick = "";
                 document.getElementById("watch_button").href = "#restart_required";
             }
-                        
-            function watch() {                                          
+
+            function watch() {
                 console.log("TAPPED");
                 endpoint = remote.getGlobal("serve_movie")(IMDB_ID);
                 var currentTorrent;
@@ -480,30 +523,30 @@
                    console.log("Movie Ready!");
                     var f = PROVIDED_TIMESTAMP + 10;
                     var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
-                    var B_URL = "http://localhost:3000/stream_" + IMDB_ID;    
+                    var B_URL = "http://localhost:3000/stream_" + IMDB_ID;
                     //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
-                    //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";               
+                    //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
                     if (PROVIDED_TIMESTAMP != 0) {
-                        document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';   
+                        document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
                     } else {
-                        document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';   
-                    } 
-                });                
-                isInPlayer = true;             
+                        document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';
+                    }
+                });
+                isInPlayer = true;
                 var jumbotron = document.getElementsByClassName("jumbotron")[0];
-                var overlay = document.getElementsByClassName("overlay_dewey")[0]; 
+                var overlay = document.getElementsByClassName("overlay_dewey")[0];
                 bg_image = document.getElementById("background").style.backgroundImage;
                $("#header").fadeOut(1000);
-               $("#bg_layer").fadeTo(1000, 0);         
-                setTimeout(function() { 
+               $("#bg_layer").fadeTo(1000, 0);
+                setTimeout(function() {
                      $(".plyr").fadeIn(1000);
                     player.play();
                     $("#player_exit").fadeIn(1000);
                     document.getElementById("big_player").style.display = "block"
                     document.querySelector("video").style.display = "block"
                     //exitPlayer();
-                }, 1000);  
-                
+                }, 1000);
+
                 dlSpeedInterval = setInterval(function() {
                     var raw_speed = currentTorrent.downloadSpeed / (1e6);
                     var speed = raw_speed.toFixed(2);
@@ -515,55 +558,55 @@
                             document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>Preparing your movie...</span>";
                         } else {
                             console.log("Download Speed [KB/s]: " + speed);
-                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " KB/s</span>";                            
-                        }                        
+                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " KB/s</span>";
+                        }
                     } else {
                         console.log("Download Speed [MB/s]: " + speed);
                         document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " MB/s</span>";
                     }
                 }, 1000);
-                                                            
+
                 return false;
             }
-            
+
             function restart() {
                 fadeBodyRestart();
             }
-            
+
             remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
               .then(res => {
                 for (sub of res) {
-                    var abs_path = sub["path"];            
+                    var abs_path = sub["path"];
                     if (abs_path != '') {
-                        if (sub["lang"] == 'english') {                                    
+                        if (sub["lang"] == 'english') {
                             var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "english");
-                            document.getElementById("player").innerHTML += `<track kind="captions" label="English" src="` + remote_path + `" srclang="en" default />`;                       
+                            document.getElementById("player").innerHTML += `<track kind="captions" label="English" src="` + remote_path + `" srclang="en" default />`;
                             console.log("found english sub" + remote_path);
                             console.log("PATH:" + abs_path);
                         } else if (sub["lang"] == 'spanish') {
                             var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "spanish");
-                            document.getElementById("player").innerHTML += `<track kind="captions" label="Spanish" src="` + remote_path + `" srclang="es" default />`;                          
+                            document.getElementById("player").innerHTML += `<track kind="captions" label="Spanish" src="` + remote_path + `" srclang="es" default />`;
                             console.log("found spanish sub" + remote_path);
                             console.log("PATH:" + abs_path);
                         } else if (sub["lang"] == 'chinese') {
                             var remote_path = remote.getGlobal("serve_subtitle_track")(abs_path, movieID, "chinese");
-                            document.getElementById("player").innerHTML += `<track kind="captions" label="Chinese" src="` + remote_path + `" srclang="zh" default />`;                          
+                            document.getElementById("player").innerHTML += `<track kind="captions" label="Chinese" src="` + remote_path + `" srclang="zh" default />`;
                             console.log("found chinese sub" + remote_path);
-                            console.log("PATH:" + abs_path); 
+                            console.log("PATH:" + abs_path);
                         }
                     }
-                }                        
+                }
               })
-              .catch(error => {});            
+              .catch(error => {});
 
             const Http = new XMLHttpRequest();
-            const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen']});            
-            var details_bg = "";    
+            const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen']});
+            var details_bg = "";
             const url='http://localhost:3000/completed_movie?q=' + IMDB_ID;
             const update_url = 'http://localhost:3000/update_watching?id=' + IMDB_ID + '&timestamp=';
-            var update_interval; 
+            var update_interval;
             var COMPLETED = false;
-            
+
             // Check for restart paramater
             var autoplay = false;
             var field = 'play';
@@ -575,40 +618,40 @@
                 autoplay = true;
                 watch();
             }
-                
-                        
+
+
             player.on('timeupdate', event => {
-                var difference = player.duration - player.currentTime;                
-                //console.log("Updated current time: " + player.currentTime + "; Duration: " + player.duration + "; Difference: " + difference);   
-                
+                var difference = player.duration - player.currentTime;
+                //console.log("Updated current time: " + player.currentTime + "; Duration: " + player.duration + "; Difference: " + difference);
+
                 if (difference < 600 && !COMPLETED && player.currentTime != 0) {
                     Http.open("GET", url);
                     Http.send();
                     COMPLETED = true;
                     Http.onreadystatechange = (e) => {
                         if (this.readyState == 4) {
-                            console.log("Completed: " + Http.responseText);                            
+                            console.log("Completed: " + Http.responseText);
                         } else {
                             console.log("not there");
                         }
                     }
                 }
             });
-            
+
             player.on('controlsshown', event => {
                 if (isInPlayer){
                   $("#player_exit").fadeIn(1000);
-                } 
+                }
             });
-            
+
             player.on('controlshidden', event => {
                 if (hasPlayed) {
                     setTimeout(function() {
-                  $("#player_exit").fadeOut(1000);  
-                }, 1000);     
-                }                           
+                  $("#player_exit").fadeOut(1000);
+                }, 1000);
+                }
             });
-            
+
             player.on('ended', event => {
                 if (!COMPLETED) {
                     Http.open("GET", url);
@@ -627,17 +670,17 @@
             player.on('waiting', event => {
                 $("#player_exit").fadeIn(700);
                 if (isFirstTime) {
-                    open_notice_modal();                          
+                    open_notice_modal();
                 }
                 console.log("We're waiting");
                 open_loading_modal();
             });
-            
-            var hasPlayed = false;            
-            player.on('playing', event => {   
+
+            var hasPlayed = false;
+            player.on('playing', event => {
                 $("#player_exit").fadeOut(700);
-                if (!hasPlayed) { 
-                    hasPlayed = true;                                        
+                if (!hasPlayed) {
+                    hasPlayed = true;
                     update_interval = setInterval(updateTimestamp, 15 * 1000);
                 }
                 console.log("We're playing");
@@ -654,16 +697,16 @@
                 console.log("We're paused");
                 close_loading_modal();
             });
-            
+
             function updateTimestamp() {
                 Http.open("GET", update_url + player.currentTime + '&duration=' + player.duration + '&watching_timestamp=' + Date.now());
-                Http.send();  
+                Http.send();
             }
-            
+
             function shorten_summary(summary){
                 if (summary.length > 500){
                     return summary.substring(0, 500);
-                } 
+                }
                 return summary;
             }
             var movie = {{json_string}};
@@ -680,7 +723,7 @@
             }
             //document.getElementById("background").style = "background: url("+movie["background_image"]+");"
             var castList =  movie["cast"];
-            if (castList.length != 0) {      
+            if (castList.length != 0) {
                 var cast_string = "";
                 for (var i = 0; i < castList.length; i++){
                     var name = castList[i]["name"];
@@ -694,7 +737,7 @@
             } else {
                 document.getElementById("cast").innerHTML = "";
             }
-            
+
             if (movie["genres"].length > 0){
                 var genres_list = "";
                 for (var index in movie["genres"]){
@@ -710,17 +753,17 @@
             var on_list;
             if (movie["on_list"] == "true") {
               on_list = true;
-              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-times" style=""></i>&nbsp;&nbsp;Remove';              
+              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-times" style=""></i>&nbsp;&nbsp;Remove';
             } else {
               on_list = false;
-              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-plus" style=""></i>&nbsp;&nbsp;My List';              
+              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-plus" style=""></i>&nbsp;&nbsp;My List';
             }
-            
+
             document.getElementById("movie_title").innerHTML = movie["title"];
             document.getElementById("movie_summary").innerHTML = (movie["synopsis"]);
             /*var background_image = document.getElementById("background");
             background_image.addEventListener("load", fadeImg);*/
-            
+
             details_bg = movie["background_image"];
 
             var bgElement = document.getElementById("background");
@@ -734,19 +777,19 @@
               //bgElement.style.backgroundImage = `url(${movie["background_image"]})`;
               document.getElementById("bg_layer").style.backgroundImage = `url(${movie["background_image"]})`;
               preloaderImage = null;
-            });            
-            
+            });
+
             fadeInMovieDetails();
             function fadeInMovieDetails() {
-                $("#deets").fadeIn(400); 
+                $("#deets").fadeIn(400);
                 $("#cover_image").fadeIn(400);
-                $("#recs").fadeIn(400); 
+                $("#recs").fadeIn(400);
             }
             function fadeImg () {
               this.style.transition = "opacity 0.7s";
               this.style.opacity = "1";
             }
-            
+
             function getTimeStamp(minutes){
                 var hours = Math.floor(minutes/60);
                 var min_rem = minutes%60;
@@ -761,17 +804,17 @@
 
             //document.getElementById("watch_button").href = "stream_id?q={{watch_id}}";
             //document.getElementById("mylist_button").href = "add_to_list?q={{add_id}}";
-            
+
             var currentHighSeeds = 0;
             var currentHighIndex = 0;
-            for (var i = 0; i < movie["torrents"].length; i++) {                
+            for (var i = 0; i < movie["torrents"].length; i++) {
                 if (movie["torrents"][i]["seeds"] > currentHighSeeds && movie["torrents"][i]["quality"]) {
                     currentHighSeeds = movie["torrents"][i]["seeds"];
                     currentHighIndex = i;
                 }
             }
             if (currentHighSeeds > 100) {
-                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #32a852; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#32a852">' + currentHighSeeds + "</span>";   
+                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #32a852; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#32a852">' + currentHighSeeds + "</span>";
             } else if (currentHighSeeds > 50) {
                 document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #a8a432; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#a8a432">' + currentHighSeeds + "</span>";
             } else {
@@ -785,11 +828,11 @@
             document.getElementById("rating").innerHTML += movie["rating"]+"/10";
             document.getElementById("year").innerHTML += movie["year"];
             document.getElementById("runtime").innerHTML += getTimeStamp(movie["runtime"]);
-            
+
             function truncate(str, no_words) {
                 return str.split(" ").splice(0,no_words).join(" ");
             }
-            
+
             // Recommendations
             var movies_for_you = recsObj;
             var movies = document.getElementById("recs");
@@ -818,7 +861,7 @@
                     content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie_r["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie_r["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
                 }
             }
-            movies.innerHTML += content;                        
+            movies.innerHTML += content;
 
             function added() {
               var imdb_code = movie["imdb_code"];
@@ -830,24 +873,24 @@
                 on_list = false;
               } else {
                 message.innerHTML = "Movie added to your list!";
-                document.getElementById("mylist_button").innerHTML = '<i class="fa fa-times" style=""></i>&nbsp;&nbsp;Remove'; 
+                document.getElementById("mylist_button").innerHTML = '<i class="fa fa-times" style=""></i>&nbsp;&nbsp;Remove';
                 on_list = true;
               }
               open_modal();
             }
-            
+
             function open_modal(){
                 $(function() {
                   $("#notify").fadeIn("fast", function() { $(this).delay(1000).fadeOut("slow"); });
                });
             }
-            
+
             function close_modal(){
                 $(function() {
                   $("#notify").fadeOut();
                });
             }
-            
+
             var isNoticeOpen = false;
             function open_notice_modal(){
                 $(function() {
@@ -862,7 +905,7 @@
                });
                 isNoticeOpen = false;
             }
-            
+
             var isLoadingOpen = false;
             function open_loading_modal(){
                 $(function() {
@@ -870,14 +913,14 @@
                });
                 isLoadingOpen = true;
             }
-            
+
             function close_loading_modal(){
                 $(function() {
                   $(".loading_anim").fadeOut(500);
                });
                 isLoadingOpen = false;
             }
-            
+
             const images = document.getElementsByClassName("card-img-top");
             for (let img of images) {
               img.addEventListener("load", fadeImg);
@@ -888,7 +931,7 @@
             cover.src = movie["medium_cover_image"];
             cover.addEventListener("load", fadeImg);
             cover.style.opacity = "0";
-            
-        </script>        
+
+        </script>
     </body>
 </html>
