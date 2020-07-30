@@ -12,7 +12,6 @@ const http = require('http');
 var progress = require('request-progress');
 let WebTorrent = require('webtorrent')
 global.client = new WebTorrent();
-const openAboutWindow = require('about-window').default;
 const Menu = electron.Menu;
 const Fuse = require('fuse.js');
 const os = require('os');
@@ -611,59 +610,26 @@ var js = [];
 var fuse;
 function openWebDev() {
     hasWindowBeenCreatedOnce = true
-     //window.webContents.once('dom-ready', () => { global.global.global.showAbout(); });
-    addMenu();
+    // this converts JSON DB ==> ARRAY of movies (for fuzzy search)
     var js = [];
     for (var movie_id in db) {
       js.push(db[movie_id]);
     }
+    // configure fuzzy search options
     const options = {keys:['title', { name: 'cast.name', weight: 1}], threshold: 0.4};
     fuse = new Fuse(js, options);
+    // add keyboard shortcuts, hide menu bar on Windows
     if (process.platform === 'darwin') {
         electron.globalShortcut.register('Command+Q', () => {
             electron.app.quit();
         })
     } else {
+      electron.Menu.setApplicationMenu(null);
       electron.globalShortcut.register('Ctrl+Q', () => {
           electron.app.quit();
       })
     }
     //window.webContents.openDevTools();
-}
-
-//app.once
-function addMenu() {
-  const menu = Menu.buildFromTemplate([
-    {
-        label: 'Magnet',
-        submenu: [
-            {
-                label: 'About Magnet',
-                click: () =>
-                    openAboutWindow({
-                        icon_path: path.join(__dirname, 'icons/icon.ico'),
-                        package_json_dir: __dirname,
-                        win_options: {
-                            parent: window,
-                            modal: true,
-                        },
-                        show_close_button: 'Close',
-                        open_devtools: process.env.NODE_ENV !== 'production',
-                        adjust_window_size: false,
-                        homepage: "http://magnet.socifyinc.com",
-                        use_version_info: false,
-                        bug_report_url: 'https://github.com/parthsaxena/magnet/issues/new',
-                        bug_link_text: "found a bug?",
-                        css_path: path.join(__dirname, 'css/about.css'),
-                        copyright: "Open-source software from Parth & Anshul",
-                        open_devtools: false
-                    })
-            },
-        ],
-    },
-]);
-electron.app.applicationMenu = menu;
-console.log("Added Menu");
 }
 
 //
@@ -702,7 +668,7 @@ app.get('/movie', cors(), function(request, response) {
         values["timestamp"] = history_db[imdb_id]["timestamp"];
         values["duration"] = history_db[imdb_id]["duration"];
     }
-    console.log("[Airplay]: http://" + LOCAL_IP + ":" + PORT + "/stream.html?stream=http://" + LOCAL_IP+":" + PORT + "/stream_" + imdb_id + "#t=" + values["timestamp"]+","+(values["timestamp"]+10));
+    console.log("[Airplay]: http://" + LOCAL_IP + ":" + PORT + "/stream.html?movie_id=" + imdb_id + "&stream=http://" + LOCAL_IP+":" + PORT + "/stream_" + imdb_id + "#t=" + values["timestamp"]+","+(values["timestamp"]+10));
     html_content = mergeValues(values, html_content);
 
     response.write(html_content);
