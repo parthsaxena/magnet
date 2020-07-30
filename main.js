@@ -15,9 +15,27 @@ global.client = new WebTorrent();
 const openAboutWindow = require('about-window').default;
 const Menu = electron.Menu;
 const Fuse = require('fuse.js');
+const os = require('os');
 
 const VERSION = "1.0.2";
-const LOCAL_IP = "10.0.0.186";
+var LOCAL_IP = "";
+
+let networkInterfaces = os.networkInterfaces();
+for (let inet in networkInterfaces) {
+  let addresses = networkInterfaces[inet];
+  var found = false;
+  for (let i=0; i<addresses.length; i++) {
+    let address = addresses[i];
+    if (!address.internal && address.family == 'IPv4') {
+      LOCAL_IP = address.address;
+      found = true;
+      break;
+    }
+  }
+  if (found) break;
+}
+console.log("LOCAL IP: ", LOCAL_IP );
+
 const PORT = 3000;
 var window;
 
@@ -28,14 +46,12 @@ electron.dialog.showErrorBox = function(title, content) {
     console.log(`${title}\n${content}`);
 };
 
-var showAbout = false;
+global.showAbout = false;
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 cleanDirectories();
-
-Update = true;
 
 var hasWindowBeenCreatedOnce = false;
 var db;
@@ -217,7 +233,7 @@ function start() {
               });
             } else {
                 console.log("First Time Running");
-                showAbout = true;
+                global.showAbout = true;
                 var obj = {};
                 history_db = obj;
                 history_ids = Object.keys(obj);
@@ -265,7 +281,7 @@ function start() {
             }
           } else {
             // we need to update
-            showAbout = true;
+            global.showAbout = true;
             var progressBar = new ProgressBar({
                 indeterminate: false,
                 text: 'Hold on...',
@@ -317,7 +333,7 @@ function start() {
         });
       } else {
         // we need to update
-        showAbout = true;
+        global.showAbout = true;
         var progressBar = new ProgressBar({
             indeterminate: false,
             text: 'Hold on...',
@@ -595,7 +611,7 @@ var js = [];
 var fuse;
 function openWebDev() {
     hasWindowBeenCreatedOnce = true
-     //window.webContents.once('dom-ready', () => { global.showAbout(); });
+     //window.webContents.once('dom-ready', () => { global.global.global.showAbout(); });
     addMenu();
     var js = [];
     for (var movie_id in db) {
@@ -603,6 +619,15 @@ function openWebDev() {
     }
     const options = {keys:['title', { name: 'cast.name', weight: 1}], threshold: 0.4};
     fuse = new Fuse(js, options);
+    if (process.platform === 'darwin') {
+        electron.globalShortcut.register('Command+Q', () => {
+            electron.app.quit();
+        })
+    } else {
+      electron.globalShortcut.register('Ctrl+Q', () => {
+          electron.app.quit();
+      })
+    }
     //window.webContents.openDevTools();
 }
 
@@ -639,27 +664,6 @@ function addMenu() {
 ]);
 electron.app.applicationMenu = menu;
 console.log("Added Menu");
-}
-
-global.showAbout = function() {
-  openAboutWindow({
-    icon_path: path.join(__dirname, 'icons/icon.ico'),
-    package_json_dir: __dirname,
-    win_options: {
-        parent: window,
-        modal: true,
-    },
-    show_close_button: 'Close',
-    open_devtools: process.env.NODE_ENV !== 'production',
-    adjust_window_size: false,
-    homepage: "http://magnet.socifyinc.com",
-    use_version_info: false,
-    bug_report_url: 'https://github.com/parthsaxena/magnet/issues/new',
-    bug_link_text: "found a bug?",
-    css_path: path.join(__dirname, 'css/about.css'),
-    copyright: "Open-source software from Parth & Anshul",
-    open_devtools: false
-})
 }
 
 //

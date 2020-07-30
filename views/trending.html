@@ -89,7 +89,7 @@
             <!--<a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>-->
             <br><div style="text-align: center; position: relative;">
               <center><img id="app-icon" alt="App icon" height="170" src="img/logo.png" style="position: relative; top: 7px;"></center>
-            </div><br>
+            </div>
             <center>
             <h2 class="title" style="position: relative; bottom: 10px; font-size: 38px; letter-spacing:1px;">Magnet 1.0.3</h2>
             <p class="description" style="color: grey;">Open-source software from Parth & Anshul</p>
@@ -111,8 +111,8 @@
             <script>
 
             let {remote} = require('electron');
-            function openAbout() {
-              //remote.getGlobal("showAbout")();
+            if (remote.getGlobal("showAbout")) {
+              document.getElementById("about_link").click();
             }
                 function openVPNAdvisory(){
                     $(function() {
@@ -189,12 +189,6 @@
                     }
             </script>
             <style>
-            #feedback {
-              text-decoration: none!important;
-            }
-            #feedback:hover {
-              font-weight: 600;
-            }
             #about_close {
               font-family: 'Catamaran'!important;
               outline: none!important;

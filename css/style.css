@@ -85,7 +85,7 @@ a.dropdown-item:hover {
 
 .card:hover {
   cursor: pointer;
-  transition: ease-in 0.2s;   
+  transition: ease-in 0.2s;
   opacity: 0.5;
 }
 
@@ -106,15 +106,15 @@ a.dropdown-item:hover {
     border-color: #cebc8b;
 }
 .movie_details_background {
-    background-size: cover; 
-    height: 100%; 
-    width: 100%; 
+    background-size: cover;
+    height: 100%;
+    width: 100%;
     background-color: black;
 }
 
 #bg_layer {
-  background-size: cover; 
-  height: 100%; 
+  background-size: cover;
+  height: 100%;
   width: 100%;
 }
 
@@ -167,9 +167,9 @@ a.dropdown-item:hover {
 button {
     outline: none!important;
 }
-button:active { 
+button:active {
    outline:none!important;
-} 
+}
 .dropdown .dropdown-menu {
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
@@ -193,13 +193,13 @@ button:active {
     width: 36px;
     height: 36px;
     padding: 8px;
-    
+
     border: 2px solid white;
     color: #666;
     text-align: center;
 
     font-size: 25px;
-    background: none!important;    
+    background: none!important;
     padding: 0!important;
     cursor: pointer;
     border-radius: none!important;
@@ -220,7 +220,7 @@ input:active {
 .modal-content  {
     -webkit-border-radius: 0px !important;
     -moz-border-radius: 0px !important;
-    border-radius: 0px !important; 
+    border-radius: 0px !important;
     background: #cebc8b;
     border: none!important;
     font-size: 15px!important;
@@ -239,7 +239,7 @@ input:active {
   transition:all .5s ease-in-out;
   opacity:0;
   z-index:-1;
-    border: 1px solid #cebc8b;
+    /*border: 1px solid #cebc8b;*/
 }
 .modal_dewey:target {
   opacity:1;
@@ -260,7 +260,7 @@ input:active {
   transition:all .5s ease-in-out;
   opacity:0;
   z-index:-1;
-    border: 1px solid #cebc8b;    
+    /*border: 1px solid #cebc8b;*/
 }
 .modal_funny:target {
   opacity:1;
@@ -312,14 +312,14 @@ input:active {
   float:right;
   text-decoration:none;
   padding:29px 29px;
-  color:black !important;                
+  color:black !important;
   font-weight:800;
   transition:all .5s ease-in-out;
   z-index:+1;
   background:rgba(0,0,0,0);
   text-align:center;
   border-radius:0 4px 0 0;
-}            
+}
 .modal_funny-content h3 {
   padding:20px;
   display:block;
@@ -333,4 +333,21 @@ input:active {
 .modal_funny-area {
   padding:20px;
 }
-
+#feedback {
+  color: gray!important;
+  bottom: 4px!important;
+  text-decoration: none!important;
+}
+#feedback:hover {
+  font-weight: 600;
+  text-decoration:underline!important;
+}
+.title {
+  font-weight: 550;
+  top: 10px!important;
+  bottom: 20px!important;
+}
+.description {
+  padding-top: 15px!important;
+  font-size: 17px!important;
+}
