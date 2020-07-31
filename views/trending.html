@@ -113,6 +113,7 @@
             let {remote} = require('electron');
             if (remote.getGlobal("showAbout")) {
               document.getElementById("about_link").click();
+              remote.getGlobal("toggleShowAbout")();
             }
                 function openVPNAdvisory(){
                     $(function() {
