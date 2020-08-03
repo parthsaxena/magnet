@@ -9,7 +9,7 @@
     <a href="#features">Features</a> |  
     <a href="#license">License</a> |
     <a href="#contact">Contact</a>
-</p>. 
+</p> 
 <h1>Magnet</h1>
 <p align="left">Stream any movie via bittorrent protocol with personalization, recommendations, subtitles, and more.</p>
 <div id="quickstart">
@@ -36,6 +36,6 @@
     <p align="left">This work is dedicated to the public domain. See <code>LICENSE.md</code> for more details.</p>
 </div>
 <div id="contact">
-  <h2>Contact Us</h2>
-    <p align="left">Reach out to us at <code>magnet@socifyinc.com</code><br><br>Developed by <a href="http://parthsaxena.com" target="_blank">Parth Saxena</a> & <a href="https://www.instagram.com/anshulpanda/" target="_blank">Anshul Panda</p>
+  <h2>Contact</h2>
+    <p align="left">Reach out to us at <code>magnet@socifyinc.com</code> for questions or feedback.<br><br>Developed by <a href="http://parthsaxena.com" target="_blank">Parth Saxena</a> & <a href="https://www.instagram.com/anshulpanda/" target="_blank">Anshul Panda</a>.</p>
 </div>
