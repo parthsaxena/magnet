@@ -12,6 +12,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
       <script src="http://localhost:3000/js/plyr.js"></script>
+      <script src="http://localhost:3000/js/general.js"></script>
       <!--<script src="http://localhost:3000/js/general.js"></script>-->
       <link rel="stylesheet" href="http://localhost:3000/css/plyr.css" />
         <link rel="stylesheet" href="https://cdn.plyr.io/3.5.10/plyr.css" />
@@ -119,6 +120,12 @@
 
     <body>
 
+        <div class="spinner centered loading_anim" style="display:none; z-index:10;">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+        <br><center><p style="position: relative;color: white; font-size: 18px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:47px;" id="download_speed"><span style='font-weight:200'>Preparing your movie...</span></p></center>
+          </div>
+
         <div class="modal" tabindex="-1" role="dialog" id="notify" style="border-radius: none!important; ">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -134,35 +141,92 @@
                 <div class="double-bounce2"></div>
               </div>
         <video poster="" id="player" playsinline controls>
-
-                <script>
-                    function findGetParameter(parameterName) {
-                        var result = null,
-                            tmp = [];
-                        location.search
-                            .substr(1)
-                            .split("&")
-                            .forEach(function (item) {
-                              tmp = item.split("=");
-                              if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-                            });
-                        return result;
-                    }
-                    const A_URL = findGetParameter("stream");
-                    document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
-                </script>                                                    
+                                                 
                 </video>
 
-        <script>
-            const MOVIE_ID = findGetParameter("movie_id");
+        <script>        
+            var playbackStarted = false;
+            const PARTY_CODE = findGetParameter("party_code");
+            let {remote} = require('electron');
+            let PartyManager = require('./party.js');
             const player = new Plyr('#player', {captions: {active: true, update: true}});
-            const Http = new XMLHttpRequest();
-            const url='http://localhost:3000/completed_movie?q=' + MOVIE_ID;
-            const update_url = 'http://localhost:3000/update_watching?id=' + MOVIE_ID + '&timestamp=';
+            const Http = new XMLHttpRequest();                        
 
             document.querySelector("title").innerHTML = "Magnet";
 
-            var COMPLETED = false;
+            console.log("Attempting to listen to code: " + PARTY_CODE); 
+
+            remote.getGlobal("database").ref("/parties").child(PARTY_CODE).on("value", function(snapshot) {
+                var IMDB_CODE = snapshot.val().imdb_code;
+
+                var latestTimestamp = snapshot.val().playback;
+                watch(IMDB_CODE, latestTimestamp);
+                remote.getGlobal("database").ref("/parties").child(PARTY_CODE).child("events").on('child_added', function(snapshot) {
+                    var latest = snapshot.val();
+                    if (latest.type == "PLAYBACK") {
+                        latestTimestamp = latest.data;
+                    }
+                    
+                    // Skip any older events
+                    if (Date.now() - latest.timestamp > 5 * 1000) {                    
+                        return;
+                    }                    
+                                        
+                    if (latest.type == "PLAYBACK") {   
+                        // Check if we need to resync
+                        if (Math.abs(latestTimestamp - player.currentTime) > 3) {
+                            console.log("Requires update");
+                            player.currentTime = latestTimestamp;
+                        } else {
+                            console.log("No update required");
+                        }       
+                    }                
+                })   
+            })
+
+            function watch(movieID, timestamp) {
+                console.log("TAPPED");                
+
+                endpoint = remote.getGlobal("serve_movie")(movieID);
+                var currentTorrent;
+                remote.getGlobal("client").on("torrent", function(torrent) {
+                    currentTorrent = torrent;
+                   console.log("Movie Ready!");
+                    var f = timestamp + 10;
+                    var A_URL = "http://localhost:3000/stream_" + movieID + "#t=" + timestamp + "," + f                    
+                    //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
+                    //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
+                    document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
+                });
+                isInPlayer = true;
+                // var jumbotron = document.getElementsByClassName("jumbotron")[0];
+                // var overlay = document.getElementsByClassName("overlay_dewey")[0];
+                // bg_image = document.getElementById("background").style.backgroundImage;
+                // document.getElementById("big_player").style.display = "block"
+                player.play();
+                document.querySelector("video").style.display = "block"
+
+                dlSpeedInterval = setInterval(function() {
+                    var raw_speed = currentTorrent.downloadSpeed / (1e6);
+                    var speed = raw_speed.toFixed(2);
+                    if (speed < 1) {
+                        raw_speed = currentTorrent.downloadSpeed / (1e3);
+                        speed = Math.ceil(raw_speed);
+                        if (speed == 0) {
+                            console.log("Download Speed [KB/s]: " + speed);
+                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>Preparing your movie...</span>";
+                        } else {
+                            console.log("Download Speed [KB/s]: " + speed);
+                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " KB/s</span>";
+                        }
+                    } else {
+                        console.log("Download Speed [MB/s]: " + speed);
+                        document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " MB/s</span>";
+                    }
+                }, 1000);
+
+                return false;
+            }
 
             player.on('timeupdate', event => {
                 var difference = player.duration - player.currentTime;

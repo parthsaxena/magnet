@@ -240,6 +240,7 @@
               font-size: 1.3em !important;
             }
             .overlay_dewey {
+                position: relative;
                 background-color: transparent;
             }
             .your-animation {
@@ -388,39 +389,18 @@
             </div>
             <div class="overlay_dewey">
                 <button style="position: relative; bottom: 45px; display: none;" onclick="previousPage(); return false;" class="circle-back" id="back_page"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</p></button>
-          <center>
-            <div class="row" style="position: relative; bottom: 55px;">
-              <div class="col-6" style="">
-                <img src="" id="cover_image" style="position: relative; bottom: 0px; box-shadow: 1px 15px 10px black;">
-              </div>
-              <div class="col-6" style="text-align: left; position: relative; bottom: -15px; padding-bottom: 20px;" id="deets">
-                  <h4 id="movie_title"></h4><div id="space"></div>
-                  <div style="position: relative;">
-                  <div class="progress_line" style="display: inline-block;">
-                    <div class="progress" style=""></div>
-                  </div></div><i style="display: inline-block; position: relative; left: 210px; bottom: 15px;" id="progress_text"></i><br>
-                  <div style="position: relative; bottom: 15px;">
-                  <div id="genres"></div>
-                  <div style="font-weight: bold; padding-top: 10px; padding-bottom: 10px;">
-                  <div id="mpa_rating" style="display: inline; border: 1px solid #cebc8b; padding-right: 5px; padding-left: 5px; font-size: 15px; padding-top: 1px; padding-bottom: 1px; font-family: Arial;"></div>&nbsp;
-                  <div id="rating" style="display: inline;"><i class="fa fa-star" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
-                  &nbsp;<div id="year" style="display: inline;"><i class="fa fa-calendar" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
-                  &nbsp;<div id="runtime" style="display: inline;"><i class="fa fa-clock-o" style="color: #cebc8b; font-size: 1.2rem;"></i>&nbsp;&nbsp;</div>
-                  &nbsp;<div id="seeds" style="display: inline;"><i class="fas fa-signal" style="color: #32a852; font-size: 1.0rem;"></i>&nbsp;&nbsp;</div>
-                  </div>
-                  <p id="movie_summary" style="max-width: 500px; position: relative; top: 10px; max-height: 95px; overflow-y: scroll; padding-right: 5px;"></p><br>
-                  <div style="position: relative; bottom: 10px;">
-                  <div id="cast">Starring: </div><br>
-                  <a class="btn btn-outline" onclick="watch();" id="watch_button"><i class="fa fa-play" style=""></i>&nbsp;&nbsp;Watch</a>&nbsp;
-                  <a class="btn btn-outline" id="mylist_button" onclick="added()"><i class="fa fa-plus" style=""></i>&nbsp;&nbsp;My List</a> &nbsp;
-                  <a class="btn btn-outline" id="party_button" onclick="watch_party()"><i class="fas fa-users" style=""></i>&nbsp;&nbsp;Party</a>
-                  </div>
+                <style>
+                    .center {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                    }
+                </style>
+                <div class="center">
+                    <input type="text" id="code_entry" placeholder="Enter the party code..."></input>
+                    <a class="btn btn-outline" onclick="handle_code();" id="party_button"><i class="fa fa-play" style=""></i>&nbsp;&nbsp;Join</a>
                 </div>
-              </div>
-                <br><br>
-                <div id="recs" style="width: 70%; position: relative; left: 15%; top: 50px;"><h4 style="text-align: left; position: relative; right: 15px;">Similar Titles</h4></div>
-            </div>
-          </center>
           </div>
         </div>
           </div>
@@ -428,6 +408,18 @@
         </div>
       </div>
         <script>
+            function handle_code() {
+                var code = document.getElementById("code_entry").value;
+                console.log("Got Code: " + code);
+
+                PartyManager.checkIfPartyExists(code).then((snapshot) => {
+                    console.log("Party exists with that code");
+                    joinParty(code);
+                }).catch((snapshot) => {
+                    console.log("No such party with that code");
+                })
+            }
+
             // For the search
               document.querySelector('#searchbar').addEventListener('keypress', function (e) {
                   if (e.key === 'Enter') {
@@ -466,11 +458,10 @@
 
             function exitPlayer() {
                 console.log("Player exited at: "+ player.currentTime);
-                clearInterval(update_interval);
-                clearInterval(dlSpeedInterval);
-                clearInterval(partyInterval);
+                // clearInterval(update_interval);
+                clearInterval(dlSpeedInterval);                
                 if (player.currentTime != 0) {
-                    updateTimestamp();
+                    // updateTimestamp();
                     var updated_percent = Math.round(100*(player.currentTime/60)/(movie["runtime"]));
                     $(".progress").css("width", updated_percent+"%");
                     if (updated_percent >= 1){
@@ -501,114 +492,63 @@
                     $("#bg_layer").fadeTo(500, 1);
                 });
             }
-
-            const IMDB_ID = "{{imdb_id}}"
-            var movieID = IMDB_ID;
+                        
             let {remote} = require('electron');
             let PartyManager = require('./party.js');
             //remote.getGlobal("serve_movie")(IMDB_ID);
             var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");
-            var dlSpeedInterval;
-            var partyInterval;
+            var playbackStarted = false;            
+            const player = new Plyr('#player', {captions: {active: true, update: true}});
+            const Http = new XMLHttpRequest();                        
 
-            const PROVIDED_TIMESTAMP = {{timestamp}};
-            const DURATION = {{duration}};
-            var endpoint;
+            document.querySelector("title").innerHTML = "Magnet";
 
-            // Check if user has watched this movie in current session
-            if (remote.getGlobal("streaming_ids").includes(IMDB_ID)) {
-                console.log("User Watched Current Movie");
-                document.getElementById("watch_button").onclick = "";
-                document.getElementById("watch_button").href = "#restart_required";
-            }
+            function joinParty(code) {
+                console.log("Attempting to listen to code: " + code); 
 
-            var party_mode = false;
-            var party_code;
-            function watch_party() {
-              PartyManager.createParty(movieID).then((code) => {
-                  party_mode = true;
-                  party_code = code;
+                remote.getGlobal("database").ref("/parties").child(code).on("value", function(snapshot) {
+                    var IMDB_CODE = snapshot.val().imdb_code;
 
-                  document.getElementById("notify_message").innerHTML = "Give your friends this code: " + party_code;
-
-                  endpoint = remote.getGlobal("serve_movie")(IMDB_ID);
-                  var currentTorrent;
-                  remote.getGlobal("client").on("torrent", function(torrent) {
-                      currentTorrent = torrent;
-                    console.log("Movie Ready!");
-                      var f = PROVIDED_TIMESTAMP + 10;
-                      var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
-                      var B_URL = "http://localhost:3000/stream_" + IMDB_ID;
-                      //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
-                      //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
-                      if (PROVIDED_TIMESTAMP != 0) {
-                          document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
-                      } else {
-                          document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';
-                      }
-                  });
-                  isInPlayer = true;
-                  var jumbotron = document.getElementsByClassName("jumbotron")[0];
-                  var overlay = document.getElementsByClassName("overlay_dewey")[0];
-                  bg_image = document.getElementById("background").style.backgroundImage;
-                $("#header").fadeOut(1000);
-                $("#bg_layer").fadeTo(1000, 0);
-                  setTimeout(function() {
-                      $(".plyr").fadeIn(1000);
-                      player.play();
-                      $("#player_exit").fadeIn(1000);
-                      document.getElementById("big_player").style.display = "block"
-                      document.querySelector("video").style.display = "block"
-                      //exitPlayer();
-                  }, 1000);
-
-                  dlSpeedInterval = setInterval(function() {
-                      var raw_speed = currentTorrent.downloadSpeed / (1e6);
-                      var speed = raw_speed.toFixed(2);
-                      if (speed < 1) {
-                          raw_speed = currentTorrent.downloadSpeed / (1e3);
-                          speed = Math.ceil(raw_speed);
-                          if (speed == 0) {
-                              console.log("Download Speed [KB/s]: " + speed);
-                              document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>Preparing your movie...</span>";
-                          } else {
-                              console.log("Download Speed [KB/s]: " + speed);
-                              document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " KB/s</span>";
-                          }
-                      } else {
-                          console.log("Download Speed [MB/s]: " + speed);
-                          document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " MB/s</span>";
-                      }
-                  }, 1000);
-
-                  partyInterval = setInterval(function() {
-                    console.log("Emitted Party Update");
-                    PartyManager.pushGenericEvent(party_code, "PLAYBACK", player.currentTime);
-                    PartyManager.updateTimestamp(party_code, player.currentTime);
-                  }, 4000);
-
-                  return false;
+                    var latestTimestamp = snapshot.val().playback;
+                    watch(IMDB_CODE, latestTimestamp);
+                    remote.getGlobal("database").ref("/parties").child(code).child("events").on('child_added', function(snapshot) {
+                        var latest = snapshot.val();
+                        if (latest.type == "PLAYBACK") {
+                            latestTimestamp = latest.data;
+                        }
+                        
+                        // Skip any events from more than 5 seconds ago
+                        if (Date.now() - latest.timestamp > 5 * 1000) {                    
+                            return;
+                        }                    
+                                            
+                        if (latest.type == "PLAYBACK") {   
+                            // Check if we need to resync
+                            if (Math.abs(latestTimestamp - player.currentTime) > 3) {
+                                console.log("Requires update");
+                                player.currentTime = latestTimestamp;
+                            } else {
+                                console.log("No update required");
+                            }       
+                        } else if (latest.type == "PAUSE") {
+                            player.pause();
+                        } else if (latest.type == "PLAY") {
+                            player.play();
+                        }
+                    })   
                 })
-            }
+            }                        
 
-            function watch() {
-                party_mode = false;
+            function watch(movieID, timestamp) {
                 console.log("TAPPED");
-                endpoint = remote.getGlobal("serve_movie")(IMDB_ID);
+                endpoint = remote.getGlobal("serve_movie")(movieID);
                 var currentTorrent;
                 remote.getGlobal("client").on("torrent", function(torrent) {
                     currentTorrent = torrent;
                    console.log("Movie Ready!");
-                    var f = PROVIDED_TIMESTAMP + 10;
-                    var A_URL = "http://localhost:3000/stream_" + IMDB_ID + "#t=" + PROVIDED_TIMESTAMP + "," + f
-                    var B_URL = "http://localhost:3000/stream_" + IMDB_ID;
-                    //A_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
-                    //xB_URL = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
-                    if (PROVIDED_TIMESTAMP != 0) {
-                        document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
-                    } else {
-                        document.getElementById("player").innerHTML += '<source src="' + B_URL + '" type="video/mp4" />  ';
-                    }
+                    var f = timestamp + 10;
+                    var A_URL = "http://localhost:3000/stream_" + movieID + "#t=" + timestamp + "," + f; 
+                    document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
                 });
                 isInPlayer = true;
                 var jumbotron = document.getElementsByClassName("jumbotron")[0];
@@ -675,28 +615,7 @@
                     }
                 }
               })
-              .catch(error => {});
-
-            const Http = new XMLHttpRequest();
-            const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen']});
-            var details_bg = "";
-            const url='http://localhost:3000/completed_movie?q=' + IMDB_ID;
-            const update_url = 'http://localhost:3000/update_watching?id=' + IMDB_ID + '&timestamp=';
-            var update_interval;
-            var COMPLETED = false;
-
-            // Check for restart paramater
-            var autoplay = false;
-            var field = 'play';
-            var check_url = window.location.href;
-            if(check_url.indexOf('?' + field + '=') != -1) {
-                autoplay = true;
-                watch();
-            } else if(check_url.indexOf('&' + field + '=') != -1) {
-                autoplay = true;
-                watch();
-            }
-
+              .catch(error => {});           
 
             player.on('timeupdate', event => {
                 var difference = player.duration - player.currentTime;
@@ -757,19 +676,13 @@
                 open_loading_modal();
             });
 
-            player.on('play', event => {
-              if (party_mode) {
-                  PartyManager.pushGenericEvent(party_code, "PLAY", "");
-                }
-            });
-
             var hasPlayed = false;
             player.on('playing', event => {
                 $("#player_exit").fadeOut(700);
                 if (!hasPlayed) {
                     hasPlayed = true;
-                    update_interval = setInterval(updateTimestamp, 15 * 1000);
-                }                
+                    // update_interval = setInterval(updateTimestamp, 15 * 1000);
+                }
                 console.log("We're playing");
                 close_loading_modal();
                 if (isFirstTime) {
@@ -781,105 +694,17 @@
                 if (isInPlayer) {
                     $("#player_exit").fadeIn(700);
                 }
-                if (party_mode) {
-                  PartyManager.pushGenericEvent(party_code, "PAUSE", "");
-                }
-
                 console.log("We're paused");
                 close_loading_modal();
             });
-
-            function updateTimestamp() {
-                Http.open("GET", update_url + player.currentTime + '&duration=' + player.duration + '&watching_timestamp=' + Date.now());
-                Http.send();
-            }
 
             function shorten_summary(summary){
                 if (summary.length > 500){
                     return summary.substring(0, 500);
                 }
                 return summary;
-            }
-            var movie = {{json_string}};
-            var recsObj = {{recs}};
-            // Updates progress of movie
-            var percent_complete = Math.round(100*PROVIDED_TIMESTAMP/DURATION);
-            $(".progress").css("width", percent_complete+"%");
-            if (percent_complete < 1){
-              $(".progress_line").hide();
-              document.getElementById("space").innerHTML = "<br>";
-            } else {
-                document.getElementById("progress_text").innerHTML = percent_complete+"%";
-                document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
-            }
-            //document.getElementById("background").style = "background: url("+movie["background_image"]+");"
-            var castList =  movie["cast"];
-            if (castList.length != 0) {
-                var cast_string = "";
-                for (var i = 0; i < castList.length; i++){
-                    var name = castList[i]["name"];
-                    if (i < (castList.length - 1)){
-                        cast_string += name+", ";
-                    } else {
-                        cast_string += name;
-                    }
-                }
-                document.getElementById("cast").innerHTML += "<i>"+cast_string+"</i>";
-            } else {
-                document.getElementById("cast").innerHTML = "";
-            }
-
-            if (movie["genres"].length > 0){
-                var genres_list = "";
-                for (var index in movie["genres"]){
-                    var genre = movie["genres"][index];
-                    if (index < (movie["genres"].length-1)){
-                        genres_list += genre+",&nbsp;&nbsp;";
-                    } else {
-                        genres_list += genre;
-                    }
-                }
-                document.getElementById("genres").innerHTML = genres_list;
-            }
-            var on_list;
-            if (movie["on_list"] == "true") {
-              on_list = true;
-              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-times" style=""></i>&nbsp;&nbsp;Remove';
-            } else {
-              on_list = false;
-              document.getElementById("mylist_button").innerHTML = '<i class="fa fa-plus" style=""></i>&nbsp;&nbsp;My List';
-            }
-
-            document.getElementById("movie_title").innerHTML = movie["title"];
-            document.getElementById("movie_summary").innerHTML = (movie["synopsis"]);
-            /*var background_image = document.getElementById("background");
-            background_image.addEventListener("load", fadeImg);*/
-
-            details_bg = movie["background_image"];
-
-            var bgElement = document.getElementById("background");
-            var jumbotron = document.getElementsByClassName("jumbotron")[0];
-            //bgElement.classList.add("bg-loading");
-            var preloaderImage = document.createElement("img");
-            preloaderImage.src = movie["background_image"]
-            preloaderImage.addEventListener('load', (event) => {
-              bgElement.classList.remove("bg-loading");
-              jumbotron.classList.add("jumbotron_animate");
-              //bgElement.style.backgroundImage = `url(${movie["background_image"]})`;
-              document.getElementById("bg_layer").style.backgroundImage = `url(${movie["background_image"]})`;
-              preloaderImage = null;
-            });
-
-            fadeInMovieDetails();
-            function fadeInMovieDetails() {
-                $("#deets").fadeIn(400);
-                $("#cover_image").fadeIn(400);
-                $("#recs").fadeIn(400);
-            }
-            function fadeImg () {
-              this.style.transition = "opacity 0.7s";
-              this.style.opacity = "1";
-            }
+            }           
+            
 
             function getTimeStamp(minutes){
                 var hours = Math.floor(minutes/60);
@@ -892,67 +717,6 @@
                     return hours + " hrs "+ min_rem + " min";
                 }
             }
-
-            //document.getElementById("watch_button").href = "stream_id?q={{watch_id}}";
-            //document.getElementById("mylist_button").href = "add_to_list?q={{add_id}}";
-
-            var currentHighSeeds = 0;
-            var currentHighIndex = 0;
-            for (var i = 0; i < movie["torrents"].length; i++) {
-                if (movie["torrents"][i]["seeds"] > currentHighSeeds && movie["torrents"][i]["quality"]) {
-                    currentHighSeeds = movie["torrents"][i]["seeds"];
-                    currentHighIndex = i;
-                }
-            }
-            if (currentHighSeeds > 100) {
-                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #32a852; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#32a852">' + currentHighSeeds + "</span>";
-            } else if (currentHighSeeds > 50) {
-                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #a8a432; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#a8a432">' + currentHighSeeds + "</span>";
-            } else {
-                document.getElementById("seeds").innerHTML = '<i class="fas fa-signal" style="color: #d10202; font-size: 1.0rem;"></i>&nbsp;&nbsp;<span style="color:#d10202">' + currentHighSeeds + "</span>";
-            }
-            if (movie["mpa_rating"] != ""){
-                document.getElementById("mpa_rating").innerHTML = movie["mpa_rating"];
-            } else {
-                document.getElementById("mpa_rating").innerHTML = "NR";
-            }
-            document.getElementById("rating").innerHTML += movie["rating"]+"/10";
-            document.getElementById("year").innerHTML += movie["year"];
-            document.getElementById("runtime").innerHTML += getTimeStamp(movie["runtime"]);
-
-            function truncate(str, no_words) {
-                return str.split(" ").splice(0,no_words).join(" ");
-            }
-
-            // Recommendations
-            var movies_for_you = recsObj;
-            var movies = document.getElementById("recs");
-            var keys = Object.keys(movies_for_you);
-            var content = "";
-            var numDisplayed = 8;
-            for (var i = 0; i < keys.length; i++) {
-                var movie_r = movies_for_you[keys[i]]
-                console.log("Found movie: " + keys[i])
-                // Number of columns after which it breaks to a new row
-                colBreakPt = 8;
-                colNumber = 1;
-                //movies.innerHTML += inner;
-                if (i%colBreakPt == 0) {
-                    // new row
-                    var synopsis = truncate(movie_r["synopsis"], 30) + "...";
-                    content += '<div class="row mx-md-n3"><div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie_r["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie_r["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
-                    //movies.innerHTML += '
-                } else if (i%colBreakPt == 7) {
-                    // end of row
-                    var synopsis = truncate(movie_r["synopsis"], 30) + "...";
-                    content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie_r["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie_r["medium_cover_image"] + '" alt="Movie Cover"></div></div></div></div>';
-                } else {
-                    // middle of row
-                    var synopsis = truncate(movie_r["synopsis"], 30) + "...";
-                    content += '<div class="col-'+colNumber+' px-md-3 padding-2"><div onclick="link_movieDetails(\'' + movie_r["imdb_code"] + '\')"><div class="card h-100"><img class="card-img-top" src="' + movie_r["medium_cover_image"] + '" alt="Movie Cover"></div></div></div>';
-                }
-            }
-            movies.innerHTML += content;
 
             function added() {
               var imdb_code = movie["imdb_code"];

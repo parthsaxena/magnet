@@ -1,5 +1,5 @@
 // Params is an object with each
-window.$ = window.jQuery = require('jquery');
+//window.$ = window.jQuery = require('jquery');
 
 function link_movieDetails(movie_id){
     if(!autoplay) {

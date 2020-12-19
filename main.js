@@ -20,7 +20,11 @@ const VERSION = "1.0.3";
 var LOCAL_IP = "";
 
 // analytics
+<<<<<<< Updated upstream
 var firebase = require("firebase/app");
+=======
+global.firebase = require("firebase/app");
+>>>>>>> Stashed changes
 require("firebase/database");
 var firebaseConfig = {
     apiKey: "AIzaSyCXX0VC1lX7UlLs2qAjhUy7ZM3YyJrwP7M",
@@ -33,7 +37,11 @@ var firebaseConfig = {
     measurementId: "G-3PV14LT24B"
 };
 firebase.initializeApp(firebaseConfig);
+<<<<<<< Updated upstream
 var database = firebase.database();
+=======
+global.database = firebase.database();
+>>>>>>> Stashed changes
 
 let networkInterfaces = os.networkInterfaces();
 for (let inet in networkInterfaces) {
@@ -704,7 +712,8 @@ function getHistoryString(ids, encoded) {
 function createWindow() {
 
     console.log("Loaded URL");
-
+    // var url = 'http://localhost:3000/stream.html?party_code=134952'
+    var url = 'http://localhost:3000/trending';
     try {
         fs.readFile(path.join(getAppDataPath(), 'exit.json'), 'utf8', function (err, data) {
             try {
@@ -730,7 +739,7 @@ function createWindow() {
                 } else {
                   window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
                     electron.app.allowRendererProcessReuse = true;
-                    window.loadURL('http://localhost:3000/trending');
+                    window.loadURL(url);                    
                     window.on('ready-to-show', function() {
                       window.show();
                       window.focus();
@@ -744,7 +753,7 @@ function createWindow() {
             } catch(err) {
               window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
                 electron.app.allowRendererProcessReuse = true;
-                window.loadURL('http://localhost:3000/trending');
+                window.loadURL(url);
                 window.on('ready-to-show', function() {
                   window.show();
                   window.focus();
@@ -759,7 +768,7 @@ function createWindow() {
     } catch (err) {
       window = new electron.BrowserWindow({title: "Magnet",minWidth: 1380, minHeight:900, width: 1380, height: 900, show: false, backgroundColor: 'black', webPreferences: {nodeIntegration: true, nodeIntegrationInSubFrames: true}});
         electron.app.allowRendererProcessReuse = true;
-        window.loadURL('http://localhost:3000/trending');
+        window.loadURL(url);
         window.on('ready-to-show', function() {
           window.show();
           window.focus();
@@ -796,7 +805,7 @@ function openWebDev() {
           electron.app.quit();
       })
     }
-    //window.webContents.openDevTools();
+    window.webContents.openDevTools();
 }
 
 //
@@ -1019,6 +1028,16 @@ app.get('/trending', cors(), function(request, response) {
     response.write(html_content);
     response.end();
     destroy_engine();
+});
+
+app.get('/party', cors(), function(request, response) {  
+  var html_content = fs.readFileSync(path.join(electron.app.getAppPath(), 'views', 'party.html'), 'utf8');  
+
+  // fb_updateTrending();
+
+  response.write(html_content);
+  response.end();
+  destroy_engine();
 });
 
 var recsObj = {};
@@ -1661,4 +1680,8 @@ function fb_updateDBDownloads() {
     var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/db_downloads/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
