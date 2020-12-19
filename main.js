@@ -20,11 +20,7 @@ const VERSION = "1.0.3";
 var LOCAL_IP = "";
 
 // analytics
-<<<<<<< Updated upstream
 var firebase = require("firebase/app");
-=======
-global.firebase = require("firebase/app");
->>>>>>> Stashed changes
 require("firebase/database");
 var firebaseConfig = {
     apiKey: "AIzaSyCXX0VC1lX7UlLs2qAjhUy7ZM3YyJrwP7M",
@@ -37,11 +33,7 @@ var firebaseConfig = {
     measurementId: "G-3PV14LT24B"
 };
 firebase.initializeApp(firebaseConfig);
-<<<<<<< Updated upstream
 var database = firebase.database();
-=======
-global.database = firebase.database();
->>>>>>> Stashed changes
 
 let networkInterfaces = os.networkInterfaces();
 for (let inet in networkInterfaces) {
