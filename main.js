@@ -897,6 +897,10 @@ app.get('/img/logo.png', cors(), function(request, response) {
     response.sendFile(path.join(electron.app.getAppPath(), 'img/logo.png'));
 });
 
+app.get('/img/popcorn.jpg', cors(), function(request, response) {
+  response.sendFile(path.join(electron.app.getAppPath(), 'img/popcorn.jpg'));
+});
+
 app.get('/css/style.css', cors(), function(request, response) {
     response.sendFile(path.join(electron.app.getAppPath(), 'css/style.css'));
 });

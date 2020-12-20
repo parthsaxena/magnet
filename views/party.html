@@ -61,7 +61,7 @@
                   </ul>
                   <!-- Links -->
                   <a id="about_link" href="#modal_dewey"><i style="padding-right: 15px; color: #cebc8b" class="fas fa-info-circle fa-lg"></i></a>
-                  <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 7px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: Arial; text-decoration: none;color: red;" href="#modal_funny"><i class="fa fa-warning" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> VPN</span></a>
+                  <a id="vpn_warning" style="display: inline; border: 1px solid red; border-radius: 4px;padding-right: 10px; padding-left: 7px; font-size: 15px; padding-top: 3px; padding-bottom: 3px; font-family: 'Jetbrains Mono', monospace; text-decoration: none;color: red;" href="/party"><i class="fa fa-plus" style="position: relative; color: red;"></i> <span style="color:#cebc8bl"> J0IN PARTY</span></a>
                  <div class="form-inline">
                       <div class="md-form my-0" style=" position: relative; top: 5px;">
                           <i class="fa fa-search" style="position: relative; left: 28px; color: #cebc8b;"></i>
@@ -75,6 +75,8 @@
           <!--/.Navbar-->
         </header>
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+
           #bg_layer {
             background-image: url(https://cdn.britannica.com/08/190708-050-634BBDC0/Woman-container-popcorn-cinema-movie-theater.jpg);
             z-index: 2;
@@ -83,15 +85,17 @@
             width: 100%;
           }
         .digit_style {
-          width: 60px!important; 
-          height: 100px!important; 
-          text-align: center;
-          border-left: none; border-right: none; border-top: none;
-          border-bottom: 2px solid white;
-          padding: 10px;
-          font-size: 20px;
-          color: white;
-          background: rgba(256,256,256,0.2);
+            font-family: 'JetBrains Mono', monospace; 
+            font-weight: 400;
+            font-size: 30px!important;
+            width: 60px!important; 
+            height: 100px!important; 
+            text-align: center;
+            border-left: none; border-right: none; border-top: none;
+            border-bottom: 2px solid white;
+            padding: 10px;            
+            color: white;
+            background: rgba(256,256,256,0.2);            
         }  
 
         .digit-group {
@@ -174,6 +178,7 @@
           }
 
           #background {
+            background-color: black!important;
             height: 100vh;
             width: 100vw;
             transition: opacity .7s ease-in;
@@ -236,9 +241,9 @@
             .centered {
             position: fixed;
             top: 50%;
-            left: 50%;
+            left: 40%;
             /* bring your own prefixes */
-            transform: translate(-50%, -50%);
+            transform: translate(-40%, -50%);
             }
 
             .plyr--full-ui input[type=range] {
@@ -350,6 +355,17 @@
             </div>
           </div>
         </div>
+
+        <div class="modal_funny" id="invalid_code_modal">
+            <div class="modal_funny-content">
+              <a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>
+              <h3>Party Not Found</h3>
+              <div class="modal_funny-area">
+                  <p><span>We couldn't find a party with that code, please try again!</span></p>
+              </div>
+            </div>
+          </div>
+
         <div class="modal_dewey" id="modal_dewey">
           <div class="modal_dewey-content">
             <!--<a href="#" class="modal_funny-close" title="Close"><i class="far fa-times-circle fa-lg"></i></a>-->
@@ -384,13 +400,13 @@
 
         <button style="position: absolute; left: 30px; top: 30px; z-index:101; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
 
-        <div class="spinner centered loading_anim" style="display:none; z-index:10;">
+        <div id="loader" class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
                 <div class="double-bounce2"></div>
             <br><center><p style="position: relative;color: white; font-size: 18px; padding-top:85px; letter-spacing: 1px; font-weight: 600;width:200px; right:47px;" id="download_speed"><span style='font-weight:200'>Preparing your movie...</span></p></center>
               </div>
 
-        <div class="modal" tabindex="-1" role="dialog" id="notify_delay" style="border-radius: none!important; z-index:10;">
+        <div class="modal" tabindex="-1" role="dialog" id="notify_delay" style="border-radius: none!important; z-index:101!important;">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
@@ -407,7 +423,13 @@
             </div>
             <textarea id="chat_box" onkeypress="onMessageChange()" style="color: white; background-color: rgba(160, 160, 160, 0.3); z-index: 10000;" placeholder="Send a message..."></textarea>
           </div>
-          <style>          
+          <style>         
+            #notify_delay {
+                position: absolute;
+                left: 40%!important;
+                transform: translate(-50%, 0%);
+            }
+
             #message {
               margin: 0;
               position: absolute;
@@ -448,6 +470,9 @@
               height: 10%;
               width: 100%;
             }          
+            textarea:focus {
+                outline: none;
+            }
           </style>
       <div id="general_layer">
       <div id="bg_layer">
@@ -465,7 +490,7 @@
               </div>
             </div>
             <div class="overlay_dewey">
-                <button style="position: relative; bottom: 45px; display: none;" onclick="previousPage(); return false;" class="circle-back" id="back_page"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</p></button>
+                <button style="position: relative; bottom: 45px; display: none;" onclick="exitPartyMode(); return false;" class="circle-back" id="back_page"><p style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px;"><</p></button>
                 <style>
                     .center {
                         position: absolute;
@@ -499,6 +524,12 @@
         </div>
       </div>
         <script>
+            function exitPartyMode() {
+                $("#bg_layer").fadeOut(300, function(){
+                    window.history.back();                     
+                });                
+            }
+
             function onMessageChange() {
               var key = window.event.keyCode;
 
@@ -519,12 +550,14 @@
             const Http = new XMLHttpRequest();   
 
             var party_code = "";
-            var party_display_name = "Anonymous";
+            var party_display_name = "Anon #" + PartyManager.generateRandomCode(4);
 
             function handle_code() {                                
+                var code = "";
                 for (var i = 0; i < 6; i++){
-                    party_code += document.getElementById("digit-"+(i+1)).value;
+                    code += document.getElementById("digit-"+(i+1)).value;
                 }
+                party_code = code;
                 console.log("Got Code: " + party_code);
 
                 PartyManager.checkIfPartyExists(party_code).then((snapshot) => {
@@ -532,6 +565,7 @@
                     joinParty(party_code);
                 }).catch((snapshot) => {
                     console.log("No such party with that code");
+                    window.location.href = "#invalid_code_modal";
                 })
             }
 
@@ -669,7 +703,7 @@
                     var latestTimestamp = snapshot.val().playback;                    
                     watch(IMDB_CODE, latestTimestamp);
                     load_subtitles(IMDB_CODE);
-                    open_loading_modal();
+                    
                     remote.getGlobal("database").ref("/parties").child(code).child("events").on('child_added', function(snapshot) {
                         var latest = snapshot.val();
                         if (latest.type == "PLAYBACK") {
@@ -678,6 +712,7 @@
 
                         if (snapshot.val().type == "CHAT") {
                             document.getElementById("chat_messages").innerHTML += "<div id='chat_message'>" + snapshot.val().data + "</div>"
+                            document.getElementById("chat_messages").scrollTop = document.getElementById("chat_messages").scrollHeight;
                         }
                         
                         // Skip any events from more than 5 seconds ago
@@ -833,7 +868,7 @@
                 }
                 console.log("We're playing");
                 close_loading_modal();
-                if (isFirstTime) {
+                if (isFirstTime) {                    
                     close_notice_modal();
                     isFirstTime = false;
                 }
@@ -903,6 +938,7 @@
             }
 
             function close_notice_modal(){
+                console.log("closing notice modal");
                 $(function() {
                   $("#notify_delay").fadeOut(500);
                });
@@ -910,7 +946,7 @@
             }
 
             var isLoadingOpen = false;
-            function open_loading_modal(){
+            function open_loading_modal(){                
                 $(function() {
                   $(".loading_anim").fadeIn(500);
                });
@@ -923,6 +959,20 @@
                });
                 isLoadingOpen = false;
             }
+
+            var img = "http://localhost:3000/img/popcorn.jpg";
+            var bgElement = document.getElementById("background");
+            var jumbotron = document.getElementsByClassName("jumbotron")[0];
+            //bgElement.classList.add("bg-loading");
+            var preloaderImage = document.createElement("img");
+            preloaderImage.src =  img;
+            preloaderImage.addEventListener('load', (event) => {
+              bgElement.classList.remove("bg-loading");
+              jumbotron.classList.add("jumbotron_animate");
+              //bgElement.style.backgroundImage = `url(${movie["background_image"]})`;
+              document.getElementById("bg_layer").style.backgroundImage = `url(${img})`;
+              preloaderImage = null;
+            });
         </script>
     </body>
 </html>

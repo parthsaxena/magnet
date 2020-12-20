@@ -79,4 +79,4 @@ function generateRandomCode(length) {
     return code;
 }
 
-module.exports = {createParty, pushGenericEvent, updateTimestamp, checkIfPartyExists};
+module.exports = {createParty, pushGenericEvent, updateTimestamp, checkIfPartyExists, generateRandomCode};
