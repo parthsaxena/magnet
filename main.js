@@ -20,7 +20,7 @@ const VERSION = "1.0.3";
 var LOCAL_IP = "";
 
 // analytics
-var firebase = require("firebase/app");
+global.firebase = require("firebase/app");
 require("firebase/database");
 var firebaseConfig = {
     apiKey: "AIzaSyCXX0VC1lX7UlLs2qAjhUy7ZM3YyJrwP7M",
@@ -33,7 +33,7 @@ var firebaseConfig = {
     measurementId: "G-3PV14LT24B"
 };
 firebase.initializeApp(firebaseConfig);
-var database = firebase.database();
+global.database = firebase.database();
 
 let networkInterfaces = os.networkInterfaces();
 for (let inet in networkInterfaces) {
@@ -1672,8 +1672,4 @@ function fb_updateDBDownloads() {
     var entry_data = {timestamp: Date.now(), ip: final_ip, location: final_location};
     updates['beta_analytics/db_downloads/' + newPostKey] = entry_data;
     return firebase.database().ref().update(updates);
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

@@ -364,7 +364,7 @@
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <p class="modal-title text-center w-100" id="notify_message" style="color:black;">It may take a few minutes for this title to start streaming.</p>
+                  <p class="modal-title text-center w-100" id="notify_message" style="color:black;">It may take a few minutes to get this party started.</p>
                 </div>
               </div>
             </div>
@@ -408,6 +408,14 @@
         </div>
       </div>
         <script>
+            let {remote} = require('electron');
+            let PartyManager = require('./party.js');
+            //remote.getGlobal("serve_movie")(IMDB_ID);
+            var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");
+            var playbackStarted = false;            
+            const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen']});
+            const Http = new XMLHttpRequest();   
+
             function handle_code() {
                 var code = document.getElementById("code_entry").value;
                 console.log("Got Code: " + code);
@@ -432,9 +440,9 @@
               });
             $("#back_page").fadeIn(1000);
             $(".plyr").hover(function() {
-              $(this).fadeIn(250);
+              //$(this).fadeIn(250);
             }, function() {
-              $(this).fadeOut(250);
+              //$(this).fadeOut(250);
             });
             $( document ).ready(function() {
                 //document.getElementById("big_player").innerHTML = '<video poster="" id="player" style="width=0; height=0; display: none!important;" playsinline controls></video>';
@@ -460,17 +468,6 @@
                 console.log("Player exited at: "+ player.currentTime);
                 // clearInterval(update_interval);
                 clearInterval(dlSpeedInterval);                
-                if (player.currentTime != 0) {
-                    // updateTimestamp();
-                    var updated_percent = Math.round(100*(player.currentTime/60)/(movie["runtime"]));
-                    $(".progress").css("width", updated_percent+"%");
-                    if (updated_percent >= 1){
-                      document.getElementById("space").innerHTML = "";
-                      $(".progress_line").show();
-                      document.getElementById("progress_text").innerHTML = updated_percent+"%";
-                      document.getElementById("watch_button").innerHTML = '<i class="fa fa-play" style=""></i>&nbsp;&nbsp;Resume';
-                    }
-                }
 
                 isInPlayer = false;
                 player.pause();
@@ -491,107 +488,10 @@
                     $(".plyr").fadeOut(1000);
                     $("#bg_layer").fadeTo(500, 1);
                 });
-            }
-                        
-            let {remote} = require('electron');
-            let PartyManager = require('./party.js');
-            //remote.getGlobal("serve_movie")(IMDB_ID);
-            var subtitlePath = remote.getGlobal("path").join(remote.getGlobal("getAppDataPath")(), "subtitles");
-            var playbackStarted = false;            
-            const player = new Plyr('#player', {captions: {active: true, update: true}});
-            const Http = new XMLHttpRequest();                        
-
-            document.querySelector("title").innerHTML = "Magnet";
-
-            function joinParty(code) {
-                console.log("Attempting to listen to code: " + code); 
-
-                remote.getGlobal("database").ref("/parties").child(code).on("value", function(snapshot) {
-                    var IMDB_CODE = snapshot.val().imdb_code;
-
-                    var latestTimestamp = snapshot.val().playback;
-                    watch(IMDB_CODE, latestTimestamp);
-                    remote.getGlobal("database").ref("/parties").child(code).child("events").on('child_added', function(snapshot) {
-                        var latest = snapshot.val();
-                        if (latest.type == "PLAYBACK") {
-                            latestTimestamp = latest.data;
-                        }
-                        
-                        // Skip any events from more than 5 seconds ago
-                        if (Date.now() - latest.timestamp > 5 * 1000) {                    
-                            return;
-                        }                    
-                                            
-                        if (latest.type == "PLAYBACK") {   
-                            // Check if we need to resync
-                            if (Math.abs(latestTimestamp - player.currentTime) > 3) {
-                                console.log("Requires update");
-                                player.currentTime = latestTimestamp;
-                            } else {
-                                console.log("No update required");
-                            }       
-                        } else if (latest.type == "PAUSE") {
-                            player.pause();
-                        } else if (latest.type == "PLAY") {
-                            player.play();
-                        }
-                    })   
-                })
-            }                        
-
-            function watch(movieID, timestamp) {
-                console.log("TAPPED");
-                endpoint = remote.getGlobal("serve_movie")(movieID);
-                var currentTorrent;
-                remote.getGlobal("client").on("torrent", function(torrent) {
-                    currentTorrent = torrent;
-                   console.log("Movie Ready!");
-                    var f = timestamp + 10;
-                    var A_URL = "http://localhost:3000/stream_" + movieID + "#t=" + timestamp + "," + f; 
-                    document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
-                });
-                isInPlayer = true;
-                var jumbotron = document.getElementsByClassName("jumbotron")[0];
-                var overlay = document.getElementsByClassName("overlay_dewey")[0];
-                bg_image = document.getElementById("background").style.backgroundImage;
-               $("#header").fadeOut(1000);
-               $("#bg_layer").fadeTo(1000, 0);
-                setTimeout(function() {
-                     $(".plyr").fadeIn(1000);
-                    player.play();
-                    $("#player_exit").fadeIn(1000);
-                    document.getElementById("big_player").style.display = "block"
-                    document.querySelector("video").style.display = "block"
-                    //exitPlayer();
-                }, 1000);
-
-                dlSpeedInterval = setInterval(function() {
-                    var raw_speed = currentTorrent.downloadSpeed / (1e6);
-                    var speed = raw_speed.toFixed(2);
-                    if (speed < 1) {
-                        raw_speed = currentTorrent.downloadSpeed / (1e3);
-                        speed = Math.ceil(raw_speed);
-                        if (speed == 0) {
-                            console.log("Download Speed [KB/s]: " + speed);
-                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>Preparing your movie...</span>";
-                        } else {
-                            console.log("Download Speed [KB/s]: " + speed);
-                            document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " KB/s</span>";
-                        }
-                    } else {
-                        console.log("Download Speed [MB/s]: " + speed);
-                        document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " MB/s</span>";
-                    }
-                }, 1000);
-
-                return false;
-            }
-
-            function restart() {
-                fadeBodyRestart();
-            }
-
-            remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
+            }                          
+            
+            function load_subtitles(movieID) {
+              remote.getGlobal("yifysubtitles")(movieID, {langs: ['en', 'es', 'zh'], path: subtitlePath, format: 'vtt'})
               .then(res => {
                 for (sub of res) {
                     var abs_path = sub["path"];
@@ -615,7 +515,102 @@
                     }
                 }
               })
-              .catch(error => {});           
+              .catch(error => {});  
+            }
+
+            function joinParty(code) {                
+                console.log("Attempting to listen to code: " + code); 
+
+                remote.getGlobal("database").ref("/parties").child(code).once("value", function(snapshot) {
+                    var IMDB_CODE = snapshot.val().imdb_code;
+
+                    var latestTimestamp = snapshot.val().playback;                    
+                    watch(IMDB_CODE, latestTimestamp);
+                    load_subtitles(IMDB_CODE);
+                    open_loading_modal();
+                    remote.getGlobal("database").ref("/parties").child(code).child("events").on('child_added', function(snapshot) {
+                        var latest = snapshot.val();
+                        if (latest.type == "PLAYBACK") {
+                            latestTimestamp = latest.data;
+                        }
+                        
+                        // Skip any events from more than 5 seconds ago
+                        if (Date.now() - latest.timestamp > 5 * 1000) {                    
+                            return;
+                        }                    
+                                            
+                        if (latest.type == "PLAYBACK") {   
+                            // Check if we need to resync
+                            if (Math.abs(latestTimestamp - player.currentTime) > 1) {
+                                console.log("Requires update");
+                                player.currentTime = latestTimestamp;
+                            } else {
+                                //console.log("No update required");
+                            }       
+                        } else if (latest.type == "PAUSE") {
+                          console.log("Pause event found");
+                            player.pause();
+                        } else if (latest.type == "PLAY") {
+                          console.log("Play event found");
+                            player.play();
+                        }
+                    })   
+                })
+            }                        
+
+            function watch(movieID, timestamp) {
+                console.log("TAPPED");
+                endpoint = remote.getGlobal("serve_movie")(movieID);
+                var currentTorrent;
+                remote.getGlobal("client").on("torrent", function(torrent) {
+                    currentTorrent = torrent;
+                   console.log("Movie Ready!: " + currentTorrent);
+                    var f = timestamp + 10;
+                    var A_URL = "http://localhost:3000/stream_" + movieID + "#t=" + timestamp + "," + f; 
+                    document.getElementById("player").innerHTML += '<source src="' + A_URL + '" type="video/mp4" />  ';
+                });
+                isInPlayer = true;
+                var jumbotron = document.getElementsByClassName("jumbotron")[0];
+                var overlay = document.getElementsByClassName("overlay_dewey")[0];
+                bg_image = document.getElementById("background").style.backgroundImage;
+               $("#header").fadeOut(1000);
+               $("#bg_layer").fadeTo(1000, 0);
+                setTimeout(function() {
+                     $(".plyr").fadeIn(1000);
+                    player.play();
+                    $("#player_exit").fadeIn(1000);
+                    document.getElementById("big_player").style.display = "block"
+                    document.querySelector("video").style.display = "block"
+                    //exitPlayer();
+                }, 1000);
+
+                dlSpeedInterval = setInterval(function() {
+                  if (typeof currentTorrent != "undefined") {
+                      var raw_speed = currentTorrent.downloadSpeed / (1e6);
+                      var speed = raw_speed.toFixed(2);
+                      if (speed < 1) {
+                          raw_speed = currentTorrent.downloadSpeed / (1e3);
+                          speed = Math.ceil(raw_speed);
+                          if (speed == 0) {
+                              //console.log("Download Speed [KB/s]: " + speed);
+                              document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>Preparing your movie...</span>";
+                          } else {
+                              //console.log("Download Speed [KB/s]: " + speed);
+                              document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " KB/s</span>";
+                          }
+                      } else {
+                          //console.log("Download Speed [MB/s]: " + speed);
+                          document.getElementById("download_speed").innerHTML = "<span style='font-weight:200'>" + speed + " MB/s</span>";
+                      }
+                    }
+                }, 1000);
+
+                return false;
+            }
+
+            function restart() {
+                fadeBodyRestart();
+            }         
 
             player.on('timeupdate', event => {
                 var difference = player.duration - player.currentTime;
@@ -676,6 +671,10 @@
                 open_loading_modal();
             });
 
+            player.on('loadeddata', event => {
+              console.log("loaded data");              
+            })
+
             var hasPlayed = false;
             player.on('playing', event => {
                 $("#player_exit").fadeOut(700);
@@ -690,7 +689,7 @@
                     isFirstTime = false;
                 }
             });
-            player.on('pause', event => {
+            player.on('pause', event => {              
                 if (isInPlayer) {
                     $("#player_exit").fadeIn(700);
                 }
@@ -775,18 +774,6 @@
                });
                 isLoadingOpen = false;
             }
-
-            const images = document.getElementsByClassName("card-img-top");
-            for (let img of images) {
-              img.addEventListener("load", fadeImg);
-              img.style.opacity = "0";
-            }
-
-            var cover = document.getElementById("cover_image");
-            cover.src = movie["medium_cover_image"];
-            cover.addEventListener("load", fadeImg);
-            cover.style.opacity = "0";
-
         </script>
     </body>
 </html>
