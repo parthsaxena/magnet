@@ -75,6 +75,36 @@
           <!--/.Navbar-->
         </header>
         <style>
+          #bg_layer {
+            background-image: url(https://cdn.britannica.com/08/190708-050-634BBDC0/Woman-container-popcorn-cinema-movie-theater.jpg);
+            z-index: 2;
+            background-size: cover;
+            height: 100%;
+            width: 100%;
+          }
+        .digit_style {
+          width: 60px!important; 
+          height: 100px!important; 
+          text-align: center;
+          border-left: none; border-right: none; border-top: none;
+          border-bottom: 2px solid white;
+          padding: 10px;
+          font-size: 20px;
+          color: white;
+          background: rgba(256,256,256,0.2);
+        }  
+
+        .digit-group {
+          display: inline-block;
+          padding: 10px;
+        }
+
+        .prompt {
+          margin-bottom: 20px;
+          font-size: 20px;
+          color: white;
+        }
+
         #feedback {
           text-decoration: none!important;
         }
@@ -308,7 +338,7 @@
               }
         </style>
     </head>
-    <body id="background" class="movie_details_background" style="overflow-y: hidden;">
+    <body id="background" style="overflow-y: hidden;">
         <script src="js/plyr.js"></script>
 
         <div class="modal_funny" id="modal_funny">
@@ -372,6 +402,54 @@
         <div id="big_player" style="display: none!important; z-index: -1; opacity: 1;">
         <video poster="" id="player" style="width=0; height=0;" playsinline controls></video>
         </div>
+        <div id="chat_overlay" style="display: none; z-index: 1000; opacity: 1; background-color:black;">
+            <div id="chat_messages" style="color: white; font-size: 12px;">
+              <div id="chat_message"><strong>Host (you): </strong>Hello duuuu</div>
+            </div>
+            <textarea id="chat_box" onkeypress="onMessageChange()" style="color: white; background-color: rgba(160, 160, 160, 0.3); z-index: 10000;" placeholder="Send a message..."></textarea>
+          </div>
+          <style>          
+            #message {
+              margin: 0;
+              position: absolute;
+              top: 50%;
+              -ms-transform: translateY(-50%);
+              transform: translateY(-50%);
+            }
+            #chat_message {
+              margin:5px;
+              padding:10px;       
+            }
+            #chat_messages {
+              overflow: auto;            
+              position: absolute;
+              bottom: 10%;
+              max-height: 90%;
+              width: 100%;
+            }
+            #big_player {
+              position: absolute;
+              top: 0;
+              left: 0;            
+              height: 100%;
+              width: 80%;
+            }
+            #chat_overlay {
+              position: absolute;
+              top: 0;
+              right: 0;
+              height:100%;
+              width: 20%;
+            }
+            #chat_box {    
+              resize: none;        
+              position: absolute;
+              bottom: 0;
+              right: 0;
+              height: 10%;
+              width: 100%;
+            }          
+          </style>
       <div id="general_layer">
       <div id="bg_layer">
       <div class="jumbotron jumbotron-fluid">
@@ -397,10 +475,24 @@
                         transform: translate(-50%, -50%);
                     }
                 </style>
-                <div class="center">
+                <!--<div class="center">
                     <input type="text" id="code_entry" placeholder="Enter the party code..."></input>
                     <a class="btn btn-outline" onclick="handle_code();" id="party_button"><i class="fa fa-play" style=""></i>&nbsp;&nbsp;Join</a>
+                </div>-->
+                <center>
+                <div class="prompt">
+                 Join the deweyson party!
                 </div>
+                <form method="get" class="digit-group" data-group-name="digits" data-autosubmit="false" autocomplete="off">
+                    <input class="digit_style" type="text" id="digit-1" name="digit-1" data-next="digit-2" />&nbsp;&nbsp;
+                    <input class="digit_style" type="text" id="digit-2" name="digit-2" data-next="digit-3" data-previous="digit-1" />&nbsp;&nbsp;
+                    <input class="digit_style" type="text" id="digit-3" name="digit-3" data-next="digit-4" data-previous="digit-2" />&nbsp;&nbsp;
+                    <input class="digit_style" type="text" id="digit-4" name="digit-4" data-next="digit-5" data-previous="digit-3" />&nbsp;&nbsp;
+                    <input class="digit_style" type="text" id="digit-5" name="digit-5" data-next="digit-6" data-previous="digit-4" />&nbsp;&nbsp;
+                    <input class="digit_style" type="text" id="digit-6" name="digit-6" data-previous="digit-5" /><br><br>
+                    <a class="btn btn-outline" onclick="handle_code();" id="party_button"><i class="fa fa-plus" style=""></i>&nbsp;&nbsp;Join</a>
+                    </form>
+                </center>
           </div>
         </div>
           </div>
@@ -408,6 +500,17 @@
         </div>
       </div>
         <script>
+            function onMessageChange() {
+              var key = window.event.keyCode;
+
+              var message = "<strong>" + party_display_name + "</strong>: " + document.getElementById("chat_box").value
+
+              if (key == 13) {
+                PartyManager.pushGenericEvent(party_code, "CHAT", message);
+                document.getElementById("chat_box").value = "";
+              }
+            }
+
             let {remote} = require('electron');
             let PartyManager = require('./party.js');
             //remote.getGlobal("serve_movie")(IMDB_ID);
@@ -416,17 +519,55 @@
             const player = new Plyr('#player', {captions: {active: true, update: true}, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen']});
             const Http = new XMLHttpRequest();   
 
-            function handle_code() {
-                var code = document.getElementById("code_entry").value;
-                console.log("Got Code: " + code);
+            var party_code = "";
+            var party_display_name = "Anonymous";
 
-                PartyManager.checkIfPartyExists(code).then((snapshot) => {
+            function handle_code() {                                
+                for (var i = 0; i < 6; i++){
+                    party_code += document.getElementById("digit-"+(i+1)).value;
+                }
+                console.log("Got Code: " + party_code);
+
+                PartyManager.checkIfPartyExists(party_code).then((snapshot) => {
                     console.log("Party exists with that code");
-                    joinParty(code);
+                    joinParty(party_code);
                 }).catch((snapshot) => {
                     console.log("No such party with that code");
                 })
             }
+
+            function isValid(input){
+              if (isNaN(document.getElementById(input[0]["id"]).value)) {
+                console.log("Number not inputted.");
+                return false;
+              }
+            }
+
+            // For joining party
+            $('.digit-group').find('input').each(function() {
+            $(this).attr('maxlength', 1);
+            $(this).on('keyup', function(e) {
+              var parent = $($(this).parent());
+              
+              if(e.keyCode === 8 || e.keyCode === 37) {
+                var prev = parent.find('input#' + $(this).data('previous'));
+                
+                if(prev.length) {
+                  $(prev).select();
+                }
+              } else if((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 65 && e.keyCode <= 90) || (e.keyCode >= 96 && e.keyCode <= 105) || e.keyCode === 39) {
+                var next = parent.find('input#' + $(this).data('next'));
+                
+                if(next.length) {
+                  $(next).select();
+                } else {
+                  if(parent.data('autosubmit')) {
+                    parent.submit();
+                  }
+                }
+              }
+            });
+          });
 
             // For the search
               document.querySelector('#searchbar').addEventListener('keypress', function (e) {
@@ -484,6 +625,7 @@
               overlay.classList.remove("overlay_fade");
               $("#header").fadeIn(1000);
 
+              $("#chat_overlay").fadeOut(500);
                 $( ".plyr" ).fadeOut("slow", function() {
                     $(".plyr").fadeOut(1000);
                     $("#bg_layer").fadeTo(500, 1);
@@ -533,6 +675,10 @@
                         if (latest.type == "PLAYBACK") {
                             latestTimestamp = latest.data;
                         }
+
+                        if (snapshot.val().type == "CHAT") {
+                            document.getElementById("chat_messages").innerHTML += "<div id='chat_message'>" + snapshot.val().data + "</div>"
+                        }
                         
                         // Skip any events from more than 5 seconds ago
                         if (Date.now() - latest.timestamp > 5 * 1000) {                    
@@ -579,8 +725,10 @@
                      $(".plyr").fadeIn(1000);
                     player.play();
                     $("#player_exit").fadeIn(1000);
+                    document.getElementById("big_player").style.width = "80%"
                     document.getElementById("big_player").style.display = "block"
                     document.querySelector("video").style.display = "block"
+                    document.getElementById("chat_overlay").style.display = "block"       
                     //exitPlayer();
                 }, 1000);
 
