@@ -164,7 +164,7 @@
                 height:100%;
             }
             .spinner {
-                z-index: 10 !important;
+                z-index: 101 !important;
             width: 100px;
             height: 100px;
 
@@ -364,7 +364,7 @@
           </div>
         </div>
 
-        <button style="position: absolute; left: 30px; top: 30px; z-index:100; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
+        <button style="position: absolute; left: 30px; top: 30px; z-index:101; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
 
         <div class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
@@ -376,7 +376,7 @@
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <p class="modal-title text-center w-100" id="notify_message" style="color:black;">It may take a few minutes for this title to start streaming.</p>
+                  <p class="modal-title text-center w-100" id="notify_message" style="color:black; z-index: 101;">It may take a few minutes for this title to start streaming.</p>
                 </div>
               </div>
             </div>
@@ -385,8 +385,7 @@
         <video poster="" id="player" style="width=0; height=0;" playsinline controls></video>
         </div>
         <div id="chat_overlay" style="display: none; z-index: 1000; opacity: 1; background-color:black;">
-          <div id="chat_messages" style="color: white; font-size: 12px;">
-            <div id="chat_message"><strong>Host (you): </strong>Hello duuuu</div>
+          <div id="chat_messages" style="color: white; font-size: 12px;">            
           </div>
           <textarea id="chat_box" onkeypress="onMessageChange()" style="color: white; background-color: rgba(160, 160, 160, 0.3); z-index: 10000;" placeholder="Send a message..."></textarea>
         </div>
@@ -576,7 +575,7 @@
               var overlay = document.getElementsByClassName("overlay_dewey")[0];
               overlay.classList.remove("overlay_fade");
               $("#header").fadeIn(1000);
-
+              document.getElementById("big_player").style.zIndex = "-1";
               $("#chat_overlay").fadeOut(500);
                 $( ".plyr" ).fadeOut("slow", function() {
                     $(".plyr").fadeOut(1000);
@@ -652,11 +651,13 @@
                   setTimeout(function() {
                       $(".plyr").fadeIn(1000);
                       player.play();
-                      $("#player_exit").fadeIn(1000);
+                      $("#player_exit").fadeIn(1000);                      
                       document.getElementById("big_player").style.width = "80%"
                       document.getElementById("big_player").style.display = "block"
                       document.querySelector("video").style.display = "block"
                       document.getElementById("chat_overlay").style.display = "block"                      
+                      document.getElementById("big_player").style.zIndex = "100"; 
+                      console.log("Updated zindex");
                       //exitPlayer();
                   }, 1000);
 
@@ -720,6 +721,8 @@
                     document.getElementById("big_player").style.display = "block"
                     document.getElementById("big_player").style.width = "100%"
                     document.querySelector("video").style.display = "block"
+                    document.getElementById("big_player").style.zIndex = "100"; 
+                    console.log("Updated zindex");
                     //exitPlayer();
                 }, 1000);
 
