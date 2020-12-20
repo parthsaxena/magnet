@@ -403,8 +403,7 @@
         <video poster="" id="player" style="width=0; height=0;" playsinline controls></video>
         </div>
         <div id="chat_overlay" style="display: none; z-index: 1000; opacity: 1; background-color:black;">
-            <div id="chat_messages" style="color: white; font-size: 12px;">
-              <div id="chat_message"><strong>Host (you): </strong>Hello duuuu</div>
+            <div id="chat_messages" style="color: white; font-size: 17px;">              
             </div>
             <textarea id="chat_box" onkeypress="onMessageChange()" style="color: white; background-color: rgba(160, 160, 160, 0.3); z-index: 10000;" placeholder="Send a message..."></textarea>
           </div>
@@ -688,9 +687,9 @@
                                             
                         if (latest.type == "PLAYBACK") {   
                             // Check if we need to resync
-                            if (Math.abs(latestTimestamp - player.currentTime) > 1) {
+                            if (Math.abs(latestTimestamp - player.currentTime) > 2) {
                                 console.log("Requires update");
-                                player.currentTime = latestTimestamp;
+                                player.currentTime = latestTimestamp + 1;
                             } else {
                                 //console.log("No update required");
                             }       
