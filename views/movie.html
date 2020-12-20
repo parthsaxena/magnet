@@ -629,6 +629,7 @@
                   remote.getGlobal("database").ref("/parties").child(party_code).child("events").on('child_added', function(snapshot) {
                     if (snapshot.val().type == "CHAT") {
                       document.getElementById("chat_messages").innerHTML += "<div id='chat_message'>" + snapshot.val().data + "</div>"
+                      document.getElementById("chat_messages").scrollTop = document.getElementById("chat_messages").scrollHeight;
                     }
                   });
               });              
