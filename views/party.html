@@ -722,9 +722,10 @@
                                             
                         if (latest.type == "PLAYBACK") {   
                             // Check if we need to resync
-                            if (Math.abs(latestTimestamp - player.currentTime) > 2) {
+                            if (Math.abs(latestTimestamp - player.currentTime) > 1) {
                                 console.log("Requires update");
                                 player.currentTime = latestTimestamp + 1;
+                                player.play();
                             } else {
                                 //console.log("No update required");
                             }       
@@ -857,7 +858,8 @@
 
             player.on('loadeddata', event => {
               console.log("loaded data");              
-            })
+              player.play();
+            })            
 
             var hasPlayed = false;
             player.on('playing', event => {
