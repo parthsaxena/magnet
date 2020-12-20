@@ -398,7 +398,7 @@
           </div>
         </div>
 
-        <button style="position: absolute; left: 30px; top: 30px; z-index:101; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
+        <button style="position: absolute; left: 30px; top: 30px; z-index:100000!important; background: none!important; padding: 0!important; cursor: pointer; border-radius: none!important; display: none;" id="player_exit" onclick="exitPlayer();" class="circle-back"><div style="color: white; font-size: 30px; display: inline; position: relative; bottom: 7px; right: 1px; z-index:100;"><</div></button>
 
         <div id="loader" class="spinner centered loading_anim" style="display:none; z-index:10;">
                 <div class="double-bounce1"></div>
@@ -419,9 +419,9 @@
         <video poster="" id="player" style="width=0; height=0;" playsinline controls></video>
         </div>
         <div id="chat_overlay" style="display: none; z-index: 1000; opacity: 1; background-color:black;">
-            <div id="chat_messages" style="color: white; font-size: 17px;">              
+            <div id="chat_messages" style="color: white; font-size: 15px;">                     
             </div>
-            <textarea id="chat_box" onkeypress="onMessageChange()" style="color: white; background-color: rgba(160, 160, 160, 0.3); z-index: 10000;" placeholder="Send a message..."></textarea>
+            <textarea rows="3" cols="80" id="chat_box" onkeypress="onMessageChange()" style="color: white; background-color: rgba(160, 160, 160, 0.3); z-index: 10000;" placeholder="Send a message..."></textarea>
           </div>
           <style>         
             #notify_delay {
@@ -435,7 +435,7 @@
               position: absolute;
               top: 50%;
               -ms-transform: translateY(-50%);
-              transform: translateY(-50%);
+              transform: translateY(-50%);            
             }
             #chat_message {
               margin:5px;
@@ -447,6 +447,8 @@
               bottom: 10%;
               max-height: 90%;
               width: 100%;
+              font-family: 'Jetbrains Mono', monospace!important;
+                font-weight: 400;
             }
             #big_player {
               position: absolute;
@@ -469,9 +471,15 @@
               right: 0;
               height: 10%;
               width: 100%;
+              font-family: 'Jetbrains Mono', monospace!important;
+                font-weight: 400;
+                font-size: 15px;
             }          
             textarea:focus {
-                outline: none;
+                outline: none;                
+            }       
+            textarea {
+              border: none;
             }
           </style>
       <div id="general_layer">
@@ -532,12 +540,13 @@
 
             function onMessageChange() {
               var key = window.event.keyCode;
+              var box = document.getElementById("chat_box");
 
-              var message = "<strong>" + party_display_name + "</strong>: " + document.getElementById("chat_box").value
+              var message = "<strong><span style='color:#cebc8b'>" + party_display_name + "</span></strong>: " + box.value
 
-              if (key == 13) {
+              if (key == 13 && box.value.trim() != "") {
                 PartyManager.pushGenericEvent(party_code, "CHAT", message);
-                document.getElementById("chat_box").value = "";
+                box.value = "";
               }
             }
 
